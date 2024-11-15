@@ -114,7 +114,7 @@ class Recognizer:
     def __init__(
         self,
         model_dir=None,
-        language=config.language,
+        language=config.asr.language,
         segmenter=None,
         vad=None,
         asr=None,

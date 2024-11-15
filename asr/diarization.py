@@ -14,10 +14,10 @@ def get_timestamps_speakers(diarization):
     return diarization_timestamps
 
 class Diarizer:
-    def __init__(self, model=config.diarization_model, **kwargs):
+    def __init__(self, model=config.asr.diarization_model, **kwargs):
         device = 'cuda' if torch.cuda.is_available else 'cpu'
         self.pipeline = Pipeline.from_pretrained(model,
-  use_auth_token=os.environ['HF_TOKEN']).to(torch.device(device))
+  use_auth_token=config.auth.hf_token).to(torch.device(device))
 
     def diarize(self, input_path, output_path=None):
         diarization = self.pipeline(input_path)
