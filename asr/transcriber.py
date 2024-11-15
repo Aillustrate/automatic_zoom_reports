@@ -1,7 +1,7 @@
 import argparse
-from diarization import Diarizer
-from recognition import Recognizer
-from transcription import Transcription
+from asr.diarization import Diarizer
+from asr.recognition import Recognizer
+from asr.transcription import Transcription
 
 
 class Transriber:
