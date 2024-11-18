@@ -238,7 +238,7 @@ class Recognizer:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("input_path", type=str, help="Path to input audio file")
+    parser.add_argument("--input_path", type=str, help="Path to input audio file")
     args = parser.parse_args()
     recognizer = Recognizer()
     texts_with_timestamps = recognizer.recognize(args.input_path, from_file=True)

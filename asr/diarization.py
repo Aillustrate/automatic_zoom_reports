@@ -28,7 +28,7 @@ class Diarizer:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("input_path", type=str, help="Path to input audio file")
+    parser.add_argument("--input_path", type=str, help="Path to input audio file")
     args = parser.parse_args()
     diarizer = Diarizer()
     timestamps_speakers = diarizer.diarize(args.input_path, from_file=True)
