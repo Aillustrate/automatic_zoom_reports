@@ -48,7 +48,16 @@ if __name__ == "__main__":
     parser.add_argument("--input_path", type=str, help="Path to input audio file")
     parser.add_argument("--from-video", action="store_true", help="Whether to transcribe from video or audio file")
     parser.add_argument("--verbose", action="store_true", help="Whether to print detailed logs")
+    parser.add_argument("--html-output", type=str, help="Path to output HTML file")
+    parser.add_argument("--txt-output", type=str, help="Path to output TXT file")
+    parser.add_argument("--json-output", type=str, help="Path to output JSON file")
     args = parser.parse_args()
     transriber = Transriber()
     transcription = transriber.transcribe(args.input_path, from_video=args.from_video, verbose=args.verbose)
+    if args.html_output:
+        transcription.to_html(args.html_output)
+    if args.txt_output:
+        transcription.to_txt(args.txt_output)
+    if args.json_output:
+        transcription.to_json(args.json_output)
     print(transcription)

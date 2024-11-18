@@ -1,3 +1,4 @@
+import json
 import random
 from copy import deepcopy
 from typing import List, Tuple
@@ -68,15 +69,25 @@ class Transcription:
             self.texts_with_timestamps, self.timestamps_speakers
         )
 
-    def stringify(self, to_html=False):
+    def to_str(self, to_html=False):
         lines = []
         for start, end, text, speaker in self.result:
             if to_html:
                 color = self.speaker2color.get(speaker)
-                speaker = f"<p style='color:{color}'>{speaker}</p>"
+                speaker = f"<span style='color:{color}'>{speaker}</span>"
             lines.append(f"{speaker} {start} - {end}: {text}")
         sep = "<br>" if to_html else "\n"
         return sep.join(lines)
+
+
+    def to_html(self):
+        return self.to_str(to_html=True)
+
+    def to_dict(self):
+        return [
+            {"start": start, "end": end, "text": text, "speaker": speaker}
+            for start, end, text, speaker in self.result
+        ]
 
     def _get_color_mapping(self):
         speaker2color = {}
@@ -110,7 +121,21 @@ class Transcription:
                 self.speaker2color.update({new_speaker: color})
 
     def __repr__(self):
-        return self.stringify()
+        return self.to_str()
 
-    def to_html(self):
-        return self.stringify(to_html=True)
+    def save_html(self, path="transcription.html"):
+        assert path.endswith(".html"), "Path should end with .html"
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(self.to_html())
+            print(f"Saved transcription to {path}")
+
+    def save_txt(self, path="transcription.txt"):
+        assert path.endswith(".txt"), "Path should end with .txt"
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(self.to_str())
+            print(f"Saved transcription to {path}")
+
+    def save_json(self, path="transcription.json"):
+        assert path.endswith(".json"), "Path should end with .json"
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(self.to_dict(), f, indent=4, ensure_ascii=False)
