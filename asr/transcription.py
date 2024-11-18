@@ -139,3 +139,4 @@ class Transcription:
         assert path.endswith(".json"), "Path should end with .json"
         with open(path, "w", encoding="utf-8") as f:
             json.dump(self.to_dict(), f, indent=4, ensure_ascii=False)
+            print(f"Saved transcription to {path}")
