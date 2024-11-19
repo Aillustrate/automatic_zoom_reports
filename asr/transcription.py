@@ -46,6 +46,10 @@ def align_transcripts_with_speakers(texts_with_timestamps, timestamps_speakers):
         # If we found any overlapping speakers
         if main_speaker is not None:
             # Add the aligned result with the main speaker
+            if aligned_results[-1][3] == main_speaker:
+                text_start = aligned_results[-1][0]
+                text = aligned_results[-1][2] + ' ' + text
+                aligned_results.pop()
             aligned_results.append((text_start, text_end, text, main_speaker))
         else:
             # If no speaker was found, mark as unknown
