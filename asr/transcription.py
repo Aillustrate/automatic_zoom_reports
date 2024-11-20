@@ -3,17 +3,30 @@ import random
 from copy import deepcopy
 from typing import List, Tuple
 
-
-def align_transcripts_with_speakers(texts_with_timestamps, timestamps_speakers):
+def merge_same_speakers(result: List[Tuple[float, float, str, str]])-> List[Tuple[float, float, str, str]]:
+    """
+    Merge consecutive segments with the same speaker.
+    Example:
+        SPEAKER_01 1.0 - 2.0: Привет!
+        SPEAKER_01 2.0 - 3.0: Как дела?
+        becomes
+        SPEAKER_01 1.0 - 3.0: Привет! Как дела?
+    """
+    merged_result = []
+    prev_speaker = None
+    for start, end, text, speaker in result:
+        if speaker == prev_speaker:
+            merged_result[-1][2] += ' ' + text
+            merged_result[-1][1] = end
+        else:
+            merged_result.append([start, end, text, speaker])
+        prev_speaker = speaker
+    return [tuple(r) for r in merged_result]
+            
+            
+def align_transcripts_with_speakers(texts_with_timestamps: List[Tuple[float, float, str]], timestamps_speakers: List[Tuple[float, float, str]])-> List[Tuple[float, float, str, str]]:
     """
     Align speech recognition results with speaker diarization results based on timestamp overlap.
-
-    Args:
-        texts_with_timestamps: List of tuples (start, end, text)
-        timestamps_speakers: List of tuples (start, end, speaker)
-
-    Returns:
-        List of tuples (start, end, text, speaker)
     """
     aligned_results = []
 
@@ -46,23 +59,19 @@ def align_transcripts_with_speakers(texts_with_timestamps, timestamps_speakers):
         # If we found any overlapping speakers
         if main_speaker is not None:
             # Add the aligned result with the main speaker
-            if aligned_results[-1][3] == main_speaker:
-                text_start = aligned_results[-1][0]
-                text = aligned_results[-1][2] + ' ' + text
-                aligned_results.pop()
             aligned_results.append((text_start, text_end, text, main_speaker))
         else:
             # If no speaker was found, mark as unknown
             aligned_results.append((text_start, text_end, text, "UNKNOWN_SPEAKER"))
 
-    return aligned_results
+    return merge_same_speakers(aligned_results)
 
 
 class Transcription:
     def __init__(
         self,
         texts_with_timestamps: List[Tuple[float, float, str]],
-        timestamps_speakers: List[Tuple[float, float, str]],
+        timestamps_speakers: List[Tuple[float, float, str]]
     ):
         self.COLORS = ["red", "green", "blue", "orange", "pink"]
         self.texts_with_timestamps = texts_with_timestamps
@@ -70,8 +79,7 @@ class Transcription:
         self.speakers = set([speaker for _, _, speaker in self.timestamps_speakers])
         self.speaker2color = self._get_color_mapping()
         self.result = align_transcripts_with_speakers(
-            self.texts_with_timestamps, self.timestamps_speakers
-        )
+                self.texts_with_timestamps, self.timestamps_speakers)
 
     def to_str(self, to_html=False):
         lines = []
@@ -144,3 +152,26 @@ class Transcription:
         with open(path, "w", encoding="utf-8") as f:
             json.dump(self.to_dict(), f, indent=4, ensure_ascii=False)
             print(f"Saved transcription to {path}")
+            
+    @classmethod
+    def load_json(self, path):
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        texts_with_timestamps = [(r["start"], r["end"], r["text"]) for r in data]
+        timestamps_speakers = [(r["start"], r["end"], r["speaker"]) for r in data]
+        return Transcription(texts_with_timestamps, timestamps_speakers)
+
+if __name__ == "__main__":
+    transcription = Transcription.load_json("asr/results/transcription.json")
+    print(transcription)
+    transcription.rename_speakers({
+        "SPEAKER_05": "ИВАН", 
+        "SPEAKER_03": "НАСТЯ",
+        "SPEAKER_02": "САША",
+        "SPEAKER_04": "ДМИТРИЙ",
+        "SPEAKER_11": "АНТОН",
+        "SPEAKER_08": "ВАЛЕНТИН"
+        })
+    print(transcription)
+    
+    #print(merge_same_speakers(transcription.result))
