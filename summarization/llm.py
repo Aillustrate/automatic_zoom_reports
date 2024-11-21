@@ -5,6 +5,7 @@ from openai import OpenAI
 
 from config import config
 
+
 class LLM:
     def __init__(self, token_usage_report_path, system_prompt=None, 
                  system_prompt_file=None, 

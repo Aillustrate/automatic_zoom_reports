@@ -1,7 +1,8 @@
 import json
 import random
 from copy import deepcopy
-from typing import List, Tuple
+from typing import Any, Dict, List, Tuple, Union
+
 
 def merge_same_speakers(result: List[Tuple[float, float, str, str]])-> List[Tuple[float, float, str, str]]:
     """
@@ -81,19 +82,24 @@ class Transcription:
         self.result = align_transcripts_with_speakers(
                 self.texts_with_timestamps, self.timestamps_speakers)
 
-    def to_str(self, to_html=False):
+    def to_str(self, to_html=False, include_timestamps=True):
         lines = []
         for start, end, text, speaker in self.result:
             if to_html:
                 color = self.speaker2color.get(speaker)
                 speaker = f"<span style='color:{color}'>{speaker}</span>"
-            lines.append(f"{speaker} {start} - {end}: {text}")
+            if include_timestamps:
+                lines.append(f"{speaker} {start} - {end}: {text}")
+            else:
+                lines.append(f"{speaker}: {text}")
         sep = "<br>" if to_html else "\n"
         return sep.join(lines)
 
 
     def to_html(self):
-        body = self.to_str(to_html=True)
+        speaker_legend = f"<b>Участники:</b> {self.get_speaker_ledgend()}"
+        content = self.to_str(to_html=True)
+        body = f"<body>{speaker_legend}<br>{content}</body>"
         doc = f'<html><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">{body}</html>'
         return doc
 
@@ -133,6 +139,13 @@ class Transcription:
             if old_speaker in self.speaker2color:
                 color = self.speaker2color.pop(old_speaker)
                 self.speaker2color.update({new_speaker: color})
+    
+    def get_speaker_ledgend(self):
+        legend = []
+        for speaker in sorted(self.speakers):
+            color = self.speaker2color.get(speaker)
+            legend.append(f"<span style='color:{color}'>{speaker}</span>")
+        return " ".join(legend)
 
     def __repr__(self):
         return self.to_str()
@@ -154,17 +167,37 @@ class Transcription:
         with open(path, "w", encoding="utf-8") as f:
             json.dump(self.to_dict(), f, indent=4, ensure_ascii=False)
             print(f"Saved transcription to {path}")
-
+            
     @classmethod
-    def load_json(self, path):
-        with open(path, "r", encoding="utf-8") as f:
-            data = json.load(f)
+    def from_dict(self, data):
         texts_with_timestamps = [(r["start"], r["end"], r["text"]) for r in data]
         timestamps_speakers = [(r["start"], r["end"], r["speaker"]) for r in data]
         return Transcription(texts_with_timestamps, timestamps_speakers)
 
+    @classmethod
+    def from_json(self, path):
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return Transcription.from_dict(data)
+
+    
+def load_transcription_and_transcript(obj:Union[Transcription, Dict[str, Any], str]):
+    if isinstance(obj, Transcription):
+        return obj, obj.to_dict()
+    elif isinstance(obj, dict):
+        return Transcription.from_dict(obj), obj
+    elif isinstance(obj, str):
+        if obj.endswith(".json"):
+            return Transcription.from_json(obj), transcription.to_dict()
+        else:
+            raise ValueError("Path should end with .json")
+    else:
+        raise ValueError("Either transcription:Transcription, transcript:Dict[str, Any] or transcript_path:str must be provided")
+        
+
+
 if __name__ == "__main__":
-    transcription = Transcription.load_json("asr/results/transcription.json")
+    transcription = Transcription.from_json("asr/results/transcription.json")
     print(transcription)
     transcription.save_html("asr/results/transcription_merged.html")
     transcription.save_txt("asr/results/transcription_merged.txt")
@@ -178,5 +211,6 @@ if __name__ == "__main__":
         "SPEAKER_08": "ВАЛЕНТИН"
         })
     print(transcription)
+    print(transcription.get_speaker_ledgend())
 
     #print(merge_same_speakers(transcription.result))
