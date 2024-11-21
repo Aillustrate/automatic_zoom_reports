@@ -6,7 +6,7 @@ from openai import OpenAI
 from config import config
 
 class LLM:
-    def __init__(self, system_prompt=None, 
+    def __init__(self, token_usage_report_path, system_prompt=None, 
                  system_prompt_file=None, 
                  model_name=config.llm.model):
         assert system_prompt or system_prompt_file, "Either system_prompt or system_prompt_path must be provided"
@@ -14,7 +14,8 @@ class LLM:
             system_prompt_path = os.path.join(config.llm.prompts_dir, system_prompt_file)
             with open(system_prompt_path, "r") as f:
                 system_prompt = f.read()
-        with open(config.llm.token_usage_report_path, "r") as f:
+        self.token_usage_report_path = token_usage_report_path
+        with open(self.token_usage_report_path, "r") as f:
             self.token_usage_report = json.load(f)
         self.system_prompt = system_prompt
         self.model_name = model_name
