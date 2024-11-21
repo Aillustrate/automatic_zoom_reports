@@ -22,8 +22,8 @@ def merge_same_speakers(result: List[Tuple[float, float, str, str]])-> List[Tupl
             merged_result.append([start, end, text, speaker])
         prev_speaker = speaker
     return [tuple(r) for r in merged_result]
-            
-            
+
+
 def align_transcripts_with_speakers(texts_with_timestamps: List[Tuple[float, float, str]], timestamps_speakers: List[Tuple[float, float, str]])-> List[Tuple[float, float, str, str]]:
     """
     Align speech recognition results with speaker diarization results based on timestamp overlap.
@@ -73,7 +73,7 @@ class Transcription:
         texts_with_timestamps: List[Tuple[float, float, str]],
         timestamps_speakers: List[Tuple[float, float, str]]
     ):
-        self.COLORS = ["red", "green", "blue", "orange", "pink"]
+        self.COLORS = ["red", "green", "blue", "orange", "pink", "purple", "brown", "gray"]
         self.texts_with_timestamps = texts_with_timestamps
         self.timestamps_speakers = timestamps_speakers
         self.speakers = set([speaker for _, _, speaker in self.timestamps_speakers])
@@ -93,7 +93,9 @@ class Transcription:
 
 
     def to_html(self):
-        return self.to_str(to_html=True)
+        body = self.to_str(to_html=True)
+        doc = f'<html><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">{body}</html>'
+        return doc
 
     def to_dict(self):
         return [
@@ -152,7 +154,7 @@ class Transcription:
         with open(path, "w", encoding="utf-8") as f:
             json.dump(self.to_dict(), f, indent=4, ensure_ascii=False)
             print(f"Saved transcription to {path}")
-            
+
     @classmethod
     def load_json(self, path):
         with open(path, "r", encoding="utf-8") as f:
@@ -164,8 +166,11 @@ class Transcription:
 if __name__ == "__main__":
     transcription = Transcription.load_json("asr/results/transcription.json")
     print(transcription)
+    transcription.save_html("asr/results/transcription_merged.html")
+    transcription.save_txt("asr/results/transcription_merged.txt")
+    transcription.save_json("asr/results/transcription_merged.json")
     transcription.rename_speakers({
-        "SPEAKER_05": "ИВАН", 
+        "SPEAKER_05": "ИВАН",
         "SPEAKER_03": "НАСТЯ",
         "SPEAKER_02": "САША",
         "SPEAKER_04": "ДМИТРИЙ",
@@ -173,5 +178,5 @@ if __name__ == "__main__":
         "SPEAKER_08": "ВАЛЕНТИН"
         })
     print(transcription)
-    
+
     #print(merge_same_speakers(transcription.result))
