@@ -1,4 +1,5 @@
 attrdict3
+openai==1.55.0p
 pyannote.audio
 python-dotenv
 pydub
