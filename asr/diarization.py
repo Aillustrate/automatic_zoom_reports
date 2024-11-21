@@ -1,8 +1,10 @@
 import argparse
 import os
+
 import torch
-from pyannote.audio import Pipeline
 from dotenv import load_dotenv
+from pyannote.audio import Pipeline
+
 from config import config
 
 load_dotenv()

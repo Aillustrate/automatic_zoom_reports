@@ -1,7 +1,7 @@
 import os
 
-from dotenv import load_dotenv
 from attrdict import AttrDict
+from dotenv import load_dotenv
 
 
 def get_config() -> AttrDict:

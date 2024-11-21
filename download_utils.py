@@ -1,5 +1,7 @@
 import locale
+
 import yt_dlp
+
 
 def download_video_from_youtube(link, name='%(title)s'):
     ydl_opts = {

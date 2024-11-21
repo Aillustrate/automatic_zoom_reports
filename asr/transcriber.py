@@ -1,9 +1,9 @@
 import argparse
+
 from asr.diarization import Diarizer
 from asr.recognition import Recognizer
 from asr.transcription import Transcription
 from asr.utils import extract_audio
-
 from config import config
 
 
