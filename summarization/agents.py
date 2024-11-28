@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from summarization.llm import LLM
 from summarization.output_validation import (validate_keywords,
-                                   validate_structured_summary)
+                                   validate_structured_summary, validate)
 from summarization.parsing_utils import parse_structured_summary, process_keywords
 
 
@@ -47,10 +47,7 @@ class StructuredSummaryAgent(BaseAgent):
     def reply(self, text):
         output = self.llm.get_response(text)
         structured_summary = parse_structured_summary(output)
-        isvalid, message = validate_structured_summary(structured_summary)
-        if not isvalid:
-            print(message)
-            return output
+        validate(structured_summary, validate_structured_summary)
         return structured_summary
 
 class KeywordAgent(BaseAgent):
@@ -63,7 +60,5 @@ class KeywordAgent(BaseAgent):
     def reply(self, text):
         output = self.llm.get_response(text)
         keywords = process_keywords(output)
-        isvalid, message = validate_keywords(keywords)
-        if not isvalid:
-            print(message)
+        validate(keywords, validate_keywords)
         return keywords

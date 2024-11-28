@@ -1,5 +1,10 @@
 from typing import Union, List
+from warnings import warn
 
+def validate(obj, validate_fn):
+    isvalid, message = validate_fn(obj)
+    if not isvalid:
+        warn(message)
 
 def validate_keywords(keywords:Union[str, List[str]]) -> bool:
     if isinstance(keywords, str):

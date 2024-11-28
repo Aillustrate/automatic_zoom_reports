@@ -3,12 +3,15 @@ import json
 from typing import Any, Dict, List, Optional, Union
 
 from asr.transcription import Transcription, load_transcription_and_transcript
+from summarization.output_validation import validate, validate_keywords, validate_structured_summary
 
 
 class Summary:
     def __init__(self, short_summary, structured_summary, keywords, transcription:Union[Transcription, List[Dict[str, Any]], str]):
         self.short_summary = short_summary
+        validate(structured_summary, validate_structured_summary)
         self.structured_summary = structured_summary
+        validate(keywords, validate_keywords)
         self.keywords = keywords
         self.transcription, self.transcript = load_transcription_and_transcript(transcription)
         self._creation_date = Summary.init_creation_date()
