@@ -70,7 +70,8 @@ class Summary:
         """
         if include_full_transcript:
             summary_template += "\n\nРасшифровка\n{transcript}"
-        summary = summary_template.format(**self.to_dict(include_full_transcript=include_full_transcript, transcript_format="str"))
+        format_args = self.to_dict(include_full_transcript=include_full_transcript, transcript_format="str")
+        summary = summary_template.format(**format_args)
         return summary
     
     def to_html(self, include_full_transcript:bool=False):
@@ -87,7 +88,8 @@ class Summary:
         if include_full_transcript:
             summary_template += "<br><br><b>Расшифровка</b><br>{transcript}"
         summary_template += "</body></html>"
-        summary = summary_template.format(**self.to_dict(include_full_transcript=include_full_transcript, transcript_format="html"))
+        format_args = self.to_dict(include_full_transcript=include_full_transcript, transcript_format="html")
+        summary = summary_template.format(**format_args)
         return summary
     
     def __repr__(self):
