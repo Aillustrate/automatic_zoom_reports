@@ -39,7 +39,7 @@ class Summarizer:
 
     def summarize(self, transcription:Union[Transcription, List[Dict[str, Any]], str]):
         transcription, _ = load_transcription_and_transcript(transcription)
-        dialog = transcription.to_txt(include_timestamps=False)
+        dialog = transcription.to_str(include_timestamps=False)
         short_summary = self.short_summary_agent.reply(dialog)
         structured_summary = self.structured_summary_agent.reply(dialog)
         keywords = self.keyword_agent.reply(dialog)
