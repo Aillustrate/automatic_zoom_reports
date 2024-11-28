@@ -62,7 +62,7 @@ class Summary:
     
     def to_str(self, include_full_transcript:bool=False):
         summary_template = """
-        Дата: {date}
+        Дата: {self._creation_date}
         Участники: {speakers}
         Ключевые слова: {keywords}
         Супер краткое содержание\n{short_summary}\n
@@ -78,7 +78,7 @@ class Summary:
         <html>
         <meta charset="utf-8">
         <body>
-        <b>Дата:</b> {date}<br>
+        <b>Дата:</b> {self._creation_date}<br>
         <b>Участники:</b> {speakers}<br>
         <b>Ключевые слова:</b> {keywords}<br>
         <b>Супер краткое содержание:</b><br>{short_summary}<br><br>
