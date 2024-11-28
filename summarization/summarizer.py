@@ -3,7 +3,7 @@ import json
 from typing import Any, Dict, Union, List
 
 from asr.transcription import Transcription, load_transcription_and_transcript
-from summarization.agents import KeywordAgent, ShortSummaryAgent, StructuredSummaryAgent
+from summarization.agents import KeywordAgent, ShortSummaryAgent, StructuredSummaryAgent, TitleAgent
 from summarization.summary import Summary
 
 
@@ -16,6 +16,7 @@ class Summarizer:
         self.short_summary_agent = ShortSummaryAgent(self.token_usage_report_path)
         self.structured_summary_agent = StructuredSummaryAgent(self.token_usage_report_path)
         self.keyword_agent = KeywordAgent(self.token_usage_report_path)
+        self.title_agent = TitleAgent(self.token_usage_report_path)
     
     def process_transcript(self, transcript:List[Dict[str, Any]]):
         dialog = "\n".join([f"{r['speaker']}: {r['text']}" for r in transcript])
@@ -40,6 +41,7 @@ class Summarizer:
     def summarize(self, transcription:Union[Transcription, List[Dict[str, Any]], str], verbose=False):
         transcription, _ = load_transcription_and_transcript(transcription)
         dialog = transcription.to_str(include_timestamps=False)
+        title = self.title_agent.reply(dialog)
         short_summary = self.short_summary_agent.reply(dialog)
         if verbose:
             print(f"Short summary: {short_summary}")
