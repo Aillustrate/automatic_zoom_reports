@@ -42,7 +42,11 @@ class StructuredSummaryAgent(BaseAgent):
     def get_system_prompt(self):
         return """Тебе дана расшифровка встречи. Выдели от 1 до 7 тем, которые обсуждались на встрече и подпункты, обсуждавшиеся в каждой из тем.
 Для каждой темы должно быть от 2 до 7 подпунктов. Верни результаты в формате json:
-"""
+Пример выхода:
+[
+{"topic":"*тема 1*", "points":["*подпункт 1*", "*подпункт 2*"],
+...}
+]"""
 
     def reply(self, text):
         output = self.llm.get_response(text)
