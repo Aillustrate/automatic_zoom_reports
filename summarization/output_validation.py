@@ -1,5 +1,11 @@
-def validate_keywords(keywords) -> bool:
-    kw_list = keywords.split(",")
+from typing import Union, List
+
+
+def validate_keywords(keywords:Union[str, List[str]]) -> bool:
+    if isinstance(keywords, str):
+        kw_list = keywords.split(",")
+    else:
+        kw_list = keywords
     if len(kw_list) == 0:
         return False, "No keywords found"
     if len(kw_list) > 10:
