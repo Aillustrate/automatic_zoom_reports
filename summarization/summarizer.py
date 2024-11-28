@@ -1,6 +1,6 @@
 import datetime
 import json
-from typing import Any, Dict, Union
+from typing import Any, Dict, Union, List
 
 from asr.transcription import Transcription, load_transcription_and_transcript
 from summarization.agents import KeywordAgent, ShortSummaryAgent, StructuredSummaryAgent
@@ -17,12 +17,12 @@ class Summarizer:
         self.structured_summary_agent = StructuredSummaryAgent(self.token_usage_report_path)
         self.keyword_agent = KeywordAgent(self.token_usage_report_path)
     
-    def process_transcript(self, transcript:Dict[str, Any]):
+    def process_transcript(self, transcript:List[Dict[str, Any]]):
         dialog = "\n".join([f"{r['speaker']}: {r['text']}" for r in transcript])
         speakers = list(set([r['speaker'] for r in transcript]))
         return dialog, speakers
     
-    def get_summary_data(self, transcript:Dict[str, Any]):
+    def get_summary_data(self, transcript:List[Dict[str, Any]]):
         dialog, speakers = self.process_transcript(dialog)
         short_summary = self.short_summary_agent.reply(dialog)
         structured_summary = self.structured_summary_agent.reply(dialog)
@@ -37,7 +37,7 @@ class Summarizer:
         }
         return summary_data
 
-    def summarize(self, transcription:Union[Transcription, Dict[str, Any], str]):
+    def summarize(self, transcription:Union[Transcription, List[Dict[str, Any]], str]):
         transcription, _ = load_transcription_and_transcript(transcription)
         dialog = transcription.to_txt(include_timestamps=False)
         short_summary = self.short_summary_agent.reply(dialog)

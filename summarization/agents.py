@@ -18,6 +18,14 @@ class BaseAgent(ABC):
     def reply(self, text):
         return self.llm.reply(text)
     
+
+class TitleyAgent(BaseAgent):
+    def __init__(self, token_usage_report_path):
+        super().__init__(token_usage_report_path)
+        
+    def get_system_prompt(self):
+        return "Тебе дана расшифровка встречи. Сформулируй тему встречи во фразе из 1-7 слов. Например, 'Обсуждение стратегии развития'."
+        
     
 class ShortSummaryAgent(BaseAgent):
     def __init__(self, token_usage_report_path):

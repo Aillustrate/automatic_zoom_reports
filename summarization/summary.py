@@ -6,7 +6,7 @@ from asr.transcription import Transcription, load_transcription_and_transcript
 
 
 class Summary:
-    def __init__(self, short_summary, structured_summary, keywords, transcription:Union[Transcription, Dict[str, Any], str]):
+    def __init__(self, short_summary, structured_summary, keywords, transcription:Union[Transcription, List[Dict[str, Any]], str]):
         self.short_summary = short_summary
         self.structured_summary = structured_summary
         self.keywords = keywords

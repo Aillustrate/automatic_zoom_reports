@@ -181,10 +181,10 @@ class Transcription:
         return Transcription.from_dict(data)
 
     
-def load_transcription_and_transcript(obj:Union[Transcription, Dict[str, Any], str]):
+def load_transcription_and_transcript(obj:Union[Transcription, List[Dict[str, Any]], str]):
     if isinstance(obj, Transcription):
         return obj, obj.to_dict()
-    elif isinstance(obj, dict):
+    elif isinstance(obj, list):
         return Transcription.from_dict(obj), obj
     elif isinstance(obj, str):
         if obj.endswith(".json"):
@@ -192,7 +192,7 @@ def load_transcription_and_transcript(obj:Union[Transcription, Dict[str, Any], s
         else:
             raise ValueError("Path should end with .json")
     else:
-        raise ValueError("Either transcription:Transcription, transcript:Dict[str, Any] or transcript_path:str must be provided")
+        raise ValueError("Either transcription:Transcription, transcript:List[Dict[str, Any]] or transcript_path:str must be provided")
         
 
 
