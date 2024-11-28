@@ -76,7 +76,6 @@ class Summary:
         if include_full_transcript:
             summary_template += "\n\nРасшифровка\n{transcript}"
         format_args = self.to_dict(include_full_transcript=include_full_transcript, transcript_format="str")
-        print(format_args)
         summary = summary_template.format(**format_args)
         return summary
     
