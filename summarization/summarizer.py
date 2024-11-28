@@ -52,6 +52,7 @@ class Summarizer:
         if verbose:
             print(f"Keywords: {keywords}")
         summary = Summary(
+            title=title,
             short_summary=short_summary, 
             structured_summary=structured_summary, 
             keywords=keywords, 
