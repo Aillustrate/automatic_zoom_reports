@@ -37,12 +37,18 @@ class Summarizer:
         }
         return summary_data
 
-    def summarize(self, transcription:Union[Transcription, List[Dict[str, Any]], str]):
+    def summarize(self, transcription:Union[Transcription, List[Dict[str, Any]], str], verbose=False):
         transcription, _ = load_transcription_and_transcript(transcription)
         dialog = transcription.to_str(include_timestamps=False)
         short_summary = self.short_summary_agent.reply(dialog)
+        if verbose:
+            print(f"Short summary: {short_summary}")
         structured_summary = self.structured_summary_agent.reply(dialog)
+        if verbose:
+            print(f"Structured summary: {structured_summary}")
         keywords = self.keyword_agent.reply(dialog)
+        if verbose:
+            print(f"Keywords: {keywords}")
         summary = Summary(
             short_summary=short_summary, 
             structured_summary=structured_summary, 
