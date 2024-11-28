@@ -77,10 +77,16 @@ class Transcription:
         self.COLORS = ["red", "green", "blue", "orange", "pink", "purple", "brown", "gray"]
         self.texts_with_timestamps = texts_with_timestamps
         self.timestamps_speakers = timestamps_speakers
-        self.speakers = set([speaker for _, _, speaker in self.timestamps_speakers])
+        self.speakers = list(set([speaker for _, _, speaker in self.timestamps_speakers]))
         self.speaker2color = self._get_color_mapping()
         self.result = align_transcripts_with_speakers(
                 self.texts_with_timestamps, self.timestamps_speakers)
+        self.round_timestamps()
+    
+    def round_timestamps(self, precision:int=2):
+        for i in range(len(self.result)):
+            start, end, text, speaker = self.result[i]
+            self.result[i] = (round(start, precision), round(end, precision), text, speaker)
 
     def to_str(self, to_html=False, include_timestamps=True):
         lines = []

@@ -1,14 +1,15 @@
 import json
 import re
 from typing import List, Dict
+from output_validation import validate_structured_summary
 
 def parse_structured_summary(text) -> List[Dict[str, List[str]]]:
-    pattern = re.compile(r'```json\s*([\s\S]*)\s*```')
+    pattern = re.compile(r'([\s\S+])')
     match = pattern.search(text)
+    print(match.group(1))
     if match:
         return json.loads(match.group(1))
     return []
-
 
 def process_keywords(keywords):
     kw_list = keywords.split(",")
