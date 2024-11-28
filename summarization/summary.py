@@ -42,16 +42,19 @@ class Summary:
         if transcript_format == "html":
             speakers = self.transcription.get_speaker_ledgend()
             structured_summary = self.structured_summary_to_html()
+            keywords = ", ".join(self.keywords)
         elif transcript_format == "str":
             speakers = ", ".join(self.transcription.speakers)
             structured_summary = self.structured_summary_to_str()
+            keywords = ", ".join(self.keywords)
         else:
             speakers = self.transcription.speakers
             structured_summary = self.structured_summary
+            keywords = self.keywords
         data = {
             "title": self.title,
             "creation_date": self._creation_date,
-            "keywords": self.keywords,
+            "keywords": keywords,
             "speakers": speakers,
             "short_summary": self.short_summary,
             "structured_summary": structured_summary,
