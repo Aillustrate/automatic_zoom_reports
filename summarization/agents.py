@@ -16,7 +16,7 @@ class BaseAgent(ABC):
         pass
     
     def reply(self, text):
-        return self.llm.reply(text)
+        return self.llm.get_response(text)
     
 
 class TitleyAgent(BaseAgent):
@@ -45,7 +45,7 @@ class StructuredSummaryAgent(BaseAgent):
 """
 
     def reply(self, text):
-        output = self.llm.reply(text)
+        output = self.llm.get_response(text)
         structured_summary = parse_structured_summary(output)
         isvalid, message = validate_structured_summary(structured_summary)
         if not isvalid:
@@ -61,7 +61,7 @@ class KeywordAgent(BaseAgent):
         return """Тебе дана расшифровка встречи. Выдели от 3 до 7 ключевых слов, относящихся ко встрече. Ключевые слова должны быть разделены запятой."""
     
     def reply(self, text):
-        output = self.llm.reply(text)
+        output = self.llm.get_response(text)
         keywords = process_keywords(output)
         isvalid, message = validate_keywords(keywords)
         if not isvalid:
