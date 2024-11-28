@@ -4,7 +4,9 @@ from copy import deepcopy
 from typing import Any, Dict, List, Tuple, Union
 
 
-def merge_same_speakers(result: List[Tuple[float, float, str, str]])-> List[Tuple[float, float, str, str]]:
+def merge_same_speakers(
+    result: List[Tuple[float, float, str, str]]
+) -> List[Tuple[float, float, str, str]]:
     """
     Merge consecutive segments with the same speaker.
     Example:
@@ -17,7 +19,7 @@ def merge_same_speakers(result: List[Tuple[float, float, str, str]])-> List[Tupl
     prev_speaker = None
     for start, end, text, speaker in result:
         if speaker == prev_speaker:
-            merged_result[-1][2] += ' ' + text
+            merged_result[-1][2] += " " + text
             merged_result[-1][1] = end
         else:
             merged_result.append([start, end, text, speaker])
@@ -25,7 +27,10 @@ def merge_same_speakers(result: List[Tuple[float, float, str, str]])-> List[Tupl
     return [tuple(r) for r in merged_result]
 
 
-def align_transcripts_with_speakers(texts_with_timestamps: List[Tuple[float, float, str]], timestamps_speakers: List[Tuple[float, float, str]])-> List[Tuple[float, float, str, str]]:
+def align_transcripts_with_speakers(
+    texts_with_timestamps: List[Tuple[float, float, str]],
+    timestamps_speakers: List[Tuple[float, float, str]],
+) -> List[Tuple[float, float, str, str]]:
     """
     Align speech recognition results with speaker diarization results based on timestamp overlap.
     """
@@ -72,21 +77,38 @@ class Transcription:
     def __init__(
         self,
         texts_with_timestamps: List[Tuple[float, float, str]],
-        timestamps_speakers: List[Tuple[float, float, str]]
+        timestamps_speakers: List[Tuple[float, float, str]],
     ):
-        self.COLORS = ["red", "green", "blue", "orange", "pink", "purple", "brown", "gray"]
+        self.COLORS = [
+            "red",
+            "green",
+            "blue",
+            "orange",
+            "pink",
+            "purple",
+            "brown",
+            "gray",
+        ]
         self.texts_with_timestamps = texts_with_timestamps
         self.timestamps_speakers = timestamps_speakers
-        self.speakers = list(set([speaker for _, _, speaker in self.timestamps_speakers]))
+        self.speakers = list(
+            set([speaker for _, _, speaker in self.timestamps_speakers])
+        )
         self.speaker2color = self._get_color_mapping()
         self.result = align_transcripts_with_speakers(
-                self.texts_with_timestamps, self.timestamps_speakers)
+            self.texts_with_timestamps, self.timestamps_speakers
+        )
         self.round_timestamps()
-    
-    def round_timestamps(self, precision:int=2):
+
+    def round_timestamps(self, precision: int = 2):
         for i in range(len(self.result)):
             start, end, text, speaker = self.result[i]
-            self.result[i] = (round(start, precision), round(end, precision), text, speaker)
+            self.result[i] = (
+                round(start, precision),
+                round(end, precision),
+                text,
+                speaker,
+            )
 
     def to_str(self, to_html=False, include_timestamps=True):
         lines = []
@@ -100,7 +122,6 @@ class Transcription:
                 lines.append(f"{speaker}: {text}")
         sep = "<br>" if to_html else "\n"
         return sep.join(lines)
-
 
     def to_html(self):
         speaker_legend = f"<b>Участники:</b> {self.get_speaker_ledgend()}"
@@ -145,7 +166,7 @@ class Transcription:
             if old_speaker in self.speaker2color:
                 color = self.speaker2color.pop(old_speaker)
                 self.speaker2color.update({new_speaker: color})
-    
+
     def get_speaker_ledgend(self):
         legend = []
         for speaker in sorted(self.speakers):
@@ -173,7 +194,7 @@ class Transcription:
         with open(path, "w", encoding="utf-8") as f:
             json.dump(self.to_dict(), f, indent=4, ensure_ascii=False)
             print(f"Saved transcription to {path}")
-            
+
     @classmethod
     def from_dict(self, data):
         texts_with_timestamps = [(r["start"], r["end"], r["text"]) for r in data]
@@ -186,8 +207,10 @@ class Transcription:
             data = json.load(f)
         return Transcription.from_dict(data)
 
-    
-def load_transcription_and_transcript(obj:Union[Transcription, List[Dict[str, Any]], str]):
+
+def load_transcription_and_transcript(
+    obj: Union[Transcription, List[Dict[str, Any]], str]
+):
     if isinstance(obj, Transcription):
         return obj, obj.to_dict()
     elif isinstance(obj, list):
@@ -198,8 +221,9 @@ def load_transcription_and_transcript(obj:Union[Transcription, List[Dict[str, An
         else:
             raise ValueError("Path should end with .json")
     else:
-        raise ValueError("Either transcription:Transcription, transcript:List[Dict[str, Any]] or transcript_path:str must be provided")
-        
+        raise ValueError(
+            "Either transcription:Transcription, transcript:List[Dict[str, Any]] or transcript_path:str must be provided"
+        )
 
 
 if __name__ == "__main__":
@@ -208,15 +232,17 @@ if __name__ == "__main__":
     transcription.save_html("asr/results/transcription_merged.html")
     transcription.save_txt("asr/results/transcription_merged.txt")
     transcription.save_json("asr/results/transcription_merged.json")
-    transcription.rename_speakers({
-        "SPEAKER_05": "ИВАН",
-        "SPEAKER_03": "НАСТЯ",
-        "SPEAKER_02": "САША",
-        "SPEAKER_04": "ДМИТРИЙ",
-        "SPEAKER_11": "АНТОН",
-        "SPEAKER_08": "ВАЛЕНТИН"
-        })
+    transcription.rename_speakers(
+        {
+            "SPEAKER_05": "ИВАН",
+            "SPEAKER_03": "НАСТЯ",
+            "SPEAKER_02": "САША",
+            "SPEAKER_04": "ДМИТРИЙ",
+            "SPEAKER_11": "АНТОН",
+            "SPEAKER_08": "ВАЛЕНТИН",
+        }
+    )
     print(transcription)
     print(transcription.get_speaker_ledgend())
 
-    #print(merge_same_speakers(transcription.result))
+    # print(merge_same_speakers(transcription.result))

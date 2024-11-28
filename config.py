@@ -14,11 +14,12 @@ def get_config() -> AttrDict:
     config.asr = asr = AttrDict()
     asr.diarization_model = "pyannote/speaker-diarization-3.1"
     asr.language = "ru"
-    
+
     config.llm = llm = AttrDict()
     llm.model = "gpt-4o-mini"
     llm.prompts_dir = "llm/prompts"
     llm.token_usage_report_path = "llm/token_usage.json"
     return config
+
 
 config = get_config()
