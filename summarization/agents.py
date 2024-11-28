@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 
-from llm.llm import LLM
-from llm.output_validation import (validate_keywords,
+from summarization.llm import LLM
+from summarization.output_validation import (validate_keywords,
                                    validate_structured_summary)
-from llm.parsing_utils import parse_structured_summary, process_keywords
+from summarization.parsing_utils import parse_structured_summary, process_keywords
 
 
 class BaseAgent(ABC):

@@ -3,8 +3,8 @@ import json
 from typing import Any, Dict, Union
 
 from asr.transcription import Transcription, load_transcription_and_transcript
-from llm.agents import KeywordAgent, ShortSummaryAgent, StructuredSummaryAgent
-from llm.summary import Summary
+from summarization.agents import KeywordAgent, ShortSummaryAgent, StructuredSummaryAgent
+from summarization.summary import Summary
 
 
 class Summarizer:
