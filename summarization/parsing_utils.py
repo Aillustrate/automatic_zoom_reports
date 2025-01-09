@@ -6,12 +6,12 @@ from summarization.output_validation import validate_structured_summary
 
 
 def parse_structured_summary(text) -> List[Dict[str, List[str]]]:
-    pattern = re.compile(r"([\s\S+])")
-    match = pattern.search(text)
-    print(match.group(1))
-    if match:
-        return json.loads(match.group(1))
-    return []
+    text = re.sub(r'^```json', "", text)
+    text = re.sub(r'```$', "", text)
+    try:
+        return json.loads(text)
+    except:
+        return []
 
 
 def process_keywords(keywords):

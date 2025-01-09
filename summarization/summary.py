@@ -37,7 +37,7 @@ class Summary:
     def structured_summary_to_str(self):
         structured_summary = ""
         for topic in self.structured_summary:
-            points_str = "\n".join([f"   - {point}" for point in topic["subpoints"]])
+            points_str = "\n".join([f"   - {point}" for point in topic["points"]])
             structured_summary += f"{topic['topic']}:\n{points_str}\n"
         return structured_summary.strip()
 
@@ -45,7 +45,7 @@ class Summary:
         structured_summary = ""
         for topic in self.structured_summary:
             points_str = "\n".join(
-                [f"<li>{point}</li>" for point in topic["subpoints"]]
+                [f"<li>{point}</li>" for point in topic["points"]]
             )
             structured_summary += f"<b>{topic['topic']}:</b><ul>{points_str}</ul>"
         return structured_summary
