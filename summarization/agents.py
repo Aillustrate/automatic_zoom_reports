@@ -20,7 +20,7 @@ class BaseAgent(ABC):
         return self.llm.get_response(text)
 
 
-class TitleyAgent(BaseAgent):
+class TitleAgent(BaseAgent):
     def __init__(self, token_usage_report_path):
         super().__init__(token_usage_report_path)
 

@@ -2,7 +2,7 @@ import json
 import re
 from typing import Dict, List
 
-from output_validation import validate_structured_summary
+from summarization.output_validation import validate_structured_summary
 
 
 def parse_structured_summary(text) -> List[Dict[str, List[str]]]:
