@@ -8,6 +8,7 @@ from pyannote.audio import Pipeline
 from config import config
 
 load_dotenv()
+assert "HF_TOKEN" in os.environ, "HF_TOKEN not provided"
 
 
 def get_timestamps_speakers(diarization):
