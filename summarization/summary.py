@@ -1,6 +1,9 @@
+import sys
 import datetime
 import json
 from typing import Any, Dict, List, Optional, Union
+
+sys.path.append("automatic_zoom_reports")
 
 from asr.transcription import Transcription, load_transcription_and_transcript
 from summarization.output_validation import (

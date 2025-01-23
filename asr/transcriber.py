@@ -1,4 +1,7 @@
+import sys
 import argparse
+
+sys.path.append("automatic_zoom_reports")
 
 from asr.diarization import Diarizer
 from asr.recognition import Recognizer
