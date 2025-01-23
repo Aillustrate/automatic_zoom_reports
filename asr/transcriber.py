@@ -7,7 +7,7 @@ from asr.utils import extract_audio
 from config import config
 
 
-class Transriber:
+class Transcriber:
     def __init__(
         self,
         recognizer=None,
@@ -27,7 +27,7 @@ class Transriber:
         else:
             self.diarizer = diarizer
 
-    def transcribe(self, input_path, from_video=True, verbose=True):
+    def transcribe(self, input_path, from_video=False, verbose=True):
         VIDEO_FORMATS = ["mp4", "mkv", "avi"]
         AUDIO_FORMATS = ["wav", "mp3", "ogg", "flac"]
         if from_video and input_path.split(".")[-1] in VIDEO_FORMATS:
@@ -58,7 +58,7 @@ if __name__ == "__main__":
     parser.add_argument("--txt-output", type=str, help="Path to output TXT file")
     parser.add_argument("--json-output", type=str, help="Path to output JSON file")
     args = parser.parse_args()
-    transriber = Transriber()
+    transriber = Transcriber()
     transcription = transriber.transcribe(
         args.input_path, from_video=args.from_video, verbose=args.verbose
     )

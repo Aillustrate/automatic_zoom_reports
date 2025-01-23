@@ -3,8 +3,11 @@ import json
 from typing import Any, Dict, List, Optional, Union
 
 from asr.transcription import Transcription, load_transcription_and_transcript
-from summarization.output_validation import (validate, validate_keywords,
-                                             validate_structured_summary)
+from summarization.output_validation import (
+    validate,
+    validate_keywords,
+    validate_structured_summary,
+)
 
 
 class Summary:
@@ -44,9 +47,7 @@ class Summary:
     def structured_summary_to_html(self):
         structured_summary = ""
         for topic in self.structured_summary:
-            points_str = "\n".join(
-                [f"<li>{point}</li>" for point in topic["points"]]
-            )
+            points_str = "\n".join([f"<li>{point}</li>" for point in topic["points"]])
             structured_summary += f"<b>{topic['topic']}:</b><ul>{points_str}</ul>"
         return structured_summary
 
@@ -122,19 +123,19 @@ class Summary:
     def __repr__(self):
         return self.to_str(include_full_transcript=False)
 
-    def save_json(self, output_path: str):
+    def save_json(self, output_path: str = "summary.txt"):
         assert output_path.endswith(".json"), "Output path must end with .json"
         with open(output_path, "w") as f:
             json.dump(self.to_dict(), f, indent=4)
         print(f"Summary saved to {output_path}")
 
-    def save_txt(self, output_path: str):
+    def save_txt(self, output_path: str = "summary.txt"):
         assert output_path.endswith(".txt"), "Output path must end with .txt"
         with open(output_path, "w") as f:
             f.write(self.to_str(include_full_transcript=True))
         print(f"Summary saved to {output_path}")
 
-    def save_html(self, output_path: str):
+    def save_html(self, output_path: str = "summary.txt"):
         assert output_path.endswith(".html"), "Output path must end with .html"
         with open(output_path, "w") as f:
             f.write(self.to_html(include_full_transcript=True))

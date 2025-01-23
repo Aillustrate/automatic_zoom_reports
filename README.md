@@ -1,13 +1,13 @@
 # Automatic zoom reports
 > A tool for transcribing meeting text and summarizing it
 
-This tool allows you to submit a recording of a meeting to receive **a structured report** on it.
+This tool allows you to submit a recording of a meeting and receive **a structured report** on it.
 
-**The report contains:**
+**A report contains:**
 - keywords,
 - short summary of the meeting,
 - structured summary by the topics,
-- transcript, divided into speakers.
+- transcript, divided by speakers.
 
 [Here](https://docs.google.com/document/d/1C43QtDXFMCdJV6ZVYyMVURxpnjXLLphLwCgW0_AMOMs/edit?usp=sharing) you can see an example of a report.
 
@@ -18,12 +18,12 @@ This example was created based on [the video of the career panel](https://www.yo
 1. Clone the repository, install requirements:
 ```bash
 git clone https://github.com/Aillustrate/automatic_zoom_reports
-pip install -r requirements.txt
+bash install.sh
 ```
 
-2. For the tool to work, you need to specify two API tokens in the .env:
-- HuggingFace token. Make sure that you got access to [the diarization model](https://huggingface.co/pyannote/speaker-diarization-3.1)
-- OpenAI API token.
+2. For the tool to work, you need to specify two API tokens in the `.env`:
+- `HF_TOKEN`. Make sure that you got access to [the diarization model](https://huggingface.co/pyannote/speaker-diarization-3.1)
+- `OPENAI_API_KEY`.
 
 4. Run via Python:
 ```python
@@ -33,34 +33,28 @@ from asr.transcription import Transcription
 from summarization.summarizer import Summarizer
 from summarization.summary import Summary
 
-# set your audio path and save transcription paths
-audio_input_path = [AUDIO_PATH]
-html_transcription_output = [PATH_TO_SAVE_HTML]
-txt_transcription_output = [PATH_TO_SAVE_TXT]
-json_transcription_output = [PATH_TO_SAVE_JSON]
+# set your audio path
+audio_input_path = "your_audio.mp3"
 
 # initialize the process
 transriber = Transriber()
 transcription = transriber.transcribe(audio_input_path)
 
 # save transcript in one of the formats
-transcription.to_html(html_transcription_output)
-transcription.to_txt(txt_transcription_output)
-transcription.to_json(json_transcription_output)
+transcription.to_html()
+transcription.to_txt()
+transcription.to_json()
 
-# set your token usage json and save summary paths
-token_usage_report_path = [TOKEN_USAGE_STATS_PATH]
-summary_html_output = [PATH_TO_SAVE_HTML]
-summary_txt_output = [PATH_TO_SAVE_TXT]
-summary_json_output = [PATH_TO_SAVE_JSON]
+# set token_usage_report_path to keep track of gpt token usage
+token_usage_report_path = "token_usage.json"
 
 # initialize the process
 summary = Summarizer(token_usage_report_path).summarize(transcription)
 
 # save summary in one of the formats
-summary.save_html(summary_html_output)
-summary.save_txt(summary_txt_output)
-summary.save_json(summary_json_output)
+summary.save_html()
+summary.save_txt()
+summary.save_json()
 ```
 
 5. Completed build and bot for connection to zoom is coming soon =)

@@ -5,6 +5,7 @@ import os
 import sys
 import tempfile
 
+sys.path.append("automatic_zoom_reports")
 sys.path.append("pisets")
 
 import numpy as np
