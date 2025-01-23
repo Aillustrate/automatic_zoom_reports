@@ -28,10 +28,10 @@ bash install.sh
 4. Run via Python:
 ```python
 # import all needed modules
-from asr.transriber import Transriber
-from asr.transcription import Transcription
-from summarization.summarizer import Summarizer
-from summarization.summary import Summary
+from automatic_zoom_reports.asr.transriber import Transriber
+from automatic_zoom_reports.asr.transcription import Transcription
+from automatic_zoom_reports.summarization.summarizer import Summarizer
+from automatic_zoom_reports.summarization.summary import Summary
 
 # set your audio path
 audio_input_path = "your_audio.mp3"
