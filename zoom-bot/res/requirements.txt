@@ -1,8 +1,0 @@
-testresources
-pyautogui==0.9.54
-schedule
-psutil
-opencv-python==4.11.0.86
-pillow>=9.2.0
-requests
-PyScreeze==1.0.1
