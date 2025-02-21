@@ -56,22 +56,38 @@ def convert_labels(labels):
                 prev_label != 'O'):
                 # Convert current B- to I-
                 chosen_label = 'I-' + curr_tag
-        
         result.append(chosen_label)
     
     return result
 
 
+def correct_labels(labels):
+    correct_labels = []
+    prev_tag = "O"
+    for label in labels:
+        tag = label.split("-")[-1]
+        if tag != prev_tag and label.startswith("I-"):
+            correct_labels.append(f"B-{tag}")
+        elif tag == prev_tag and label.startswith("B-"):
+            correct_labels.append(f"I-{tag}")
+        else:
+            correct_labels.append(label)
+        prev_tag = tag
+    return correct_labels
+            
+
+
 def test_fix_ner_annotations():
     # Sample input lists of tags and texts
-    labels = [['O'], ['I-PERSON'], ['I-GPE', 'I-PERSON'], ['B-LOCATION'], ['B-LOCATION', 'B-CITY'], ['I-LOCATION'], ['O'], ['B-PERSON']]
+    #labels = [['O'], ['I-PERSON'], ['I-GPE', 'I-PERSON'], ['B-LOCATION'], ['B-LOCATION', 'B-CITY'], ['I-LOCATION'], ['O'], ['B-PERSON']]
 
+    labels = ['O', 'I-PERSON', 'I-PERSON', 'B-LOCATION', 'I-LOCATION', 'B-LOCATION', 'O', 'I-PERSON']
     expected_output = ['O', 'B-PERSON', 'I-PERSON', 'B-LOCATION', 'I-LOCATION', 'I-LOCATION', 'O', 'B-PERSON']
     
     print(labels)
 
     # Run the function
-    output = convert_labels(labels)
+    output = correct_labels(labels)
     print(output)
 
     # Check if the output matches the expected output

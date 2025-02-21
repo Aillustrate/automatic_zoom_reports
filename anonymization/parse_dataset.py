@@ -64,6 +64,8 @@ def untokenize(tokens):
 
 
 def bio2tag(tokens, labels):
+    if len(tokens) == 0:
+        return ""
     text = []
     prev_tag = "O"
     for token, label in zip(tokens, labels):
@@ -75,16 +77,16 @@ def bio2tag(tokens, labels):
         else:
             text.append(token)
         prev_tag = tag
-    if tag != "O":
+    if label != "O":
         text.append(f" <{tag.lower()}>")
     return untokenize(text)
             
 
-# Example usage
-text = "This is a <entity>test</entity> and another <entity>test</entity> and <entity>other</entity> and <org>other</org> and <org>other another</org> ."
-tokens, labels, entity_nums = tag2bio(text)
-print("Tokens:", tokens)
-print("Labels:", labels)
-print("Entity Numbers:", entity_nums)
-print(bio2tag(tokens, labels))
-assert bio2tag(tokens, labels) == text
+if __name__ == "__main__":
+    text = "This is a <entity>test</entity> and another <entity>test</entity> and <entity>other</entity> and <org>other</org> and <org>other another</org> ."
+    tokens, labels, entity_nums = tag2bio(text)
+    print("Tokens:", tokens)
+    print("Labels:", labels)
+    print("Entity Numbers:", entity_nums)
+    print(bio2tag(tokens, labels))
+    assert bio2tag(tokens, labels) == text

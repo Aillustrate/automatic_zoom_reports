@@ -1,7 +1,9 @@
 from copy import deepcopy
-from parse_dataset import bio2tag, tag2bio
+from anonymization.parse_dataset import bio2tag, tag2bio
 
 def get_entity_positions(labels):
+    if len(labels) == 0:
+        return []
     positions = []
     prev_tag = "O"
     for i, label in enumerate(labels):
@@ -11,6 +13,8 @@ def get_entity_positions(labels):
         if label.startswith("B-"):
             positions.append([i])
         prev_tag = tag
+    if label != "O":
+        positions[-1].append(i)
     return positions
 
 
@@ -41,11 +45,11 @@ class LLMValidator:
             self.get_prompt(entity, context)
             for entity, context in zip(entities, contexts)]
         print(entities)
-        responses = self.llm.generate_answer(prompts)
+        responses = self.llm.respond(prompts)
         verdicts = self.parse_responses(responses)
-        return [["test" not in entity for ut_entities in entities for entity in ut_entities]]
+        return verdicts
     
-    def validate_entities(self, tokens, labels):
+    def get_entities(self, tokens, labels):
         entities = []
         contexts = []
         entity_positions = []
@@ -55,18 +59,26 @@ class LLMValidator:
             entities.append([])
             positions = get_entity_positions(ut_labels)
             entity_positions.append(positions)
-            for start, end in positions:
-                entity = bio2tag(ut_tokens[start:end], ut_labels[start:end])
-                entities[-1].append((entity))
+            if positions:
+                for start, end in positions:
+                    entity = bio2tag(ut_tokens[start:end], ut_labels[start:end])
+                    entities[-1].append((entity))
+        return entities, contexts, entity_positions
+    
+    def validate_entities(self, tokens, labels):
+        entities, contexts, entity_positions = self.get_entities(tokens, labels)
         verdicts = self.judge(entities, contexts)
         print(verdicts)
         validated_labels = deepcopy(labels)
-        for i, ut_verdicts in enumerate(verdicts):
-            for j, verdict in enumerate(ut_verdicts):
+        n = 0
+        for i, _ in enumerate(entity_positions):
+            for j, (start, end) in enumerate(entity_positions[i]):
+                verdict = verdicts[n]
                 if verdict is False:
-                    start, end = entity_positions[i][j]
                     for j in range(start, end):
                         validated_labels[i][j] = "O"
+                n+=1
+                
         return validated_labels
 
 
