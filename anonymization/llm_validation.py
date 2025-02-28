@@ -18,9 +18,23 @@ def get_entity_positions(labels):
     return positions
 
 
+def get_verdicts(logprobs, th = 0.5):
+    verdicts = []
+    for output_logprobs in logprobs:
+        verdict = True
+        for logprob in output_logprobs:
+            if logprob.logprob > th:
+                if logprob.decoded_token.strip().lower() == "no":
+                    verdict = False
+        verdicts.append(verdict)
+    return verdicts
+    
+
+
 class LLMValidator:
-    def __init__(self, llm):
+    def __init__(self, llm, logprobs=True):
         self.llm = llm #add model init in validator init
+        self.logprobs = logprobs
         
 
     def get_prompt(self, context, entity):
@@ -39,14 +53,17 @@ class LLMValidator:
                 verdicts.append(True)
         return verdicts
             
-    
     def judge(self, entities, contexts):
         prompts = [
             self.get_prompt(entity, context)
             for entity, context in zip(entities, contexts)]
         print(entities)
-        responses = self.llm.respond(prompts)
-        verdicts = self.parse_responses(responses)
+        if self.logprobs:
+            logprobs = self.llm.get_logprobs(prompts)
+            verdicts = get_verdicts(logprobs)
+        else:
+            responses = self.llm.respond(prompts)
+            verdicts = self.parse_responses(responses)
         return verdicts
     
     def get_entities(self, tokens, labels):
