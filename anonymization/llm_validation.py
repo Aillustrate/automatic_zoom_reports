@@ -1,5 +1,6 @@
 from copy import deepcopy
 from anonymization.parse_dataset import bio2tag, tag2bio
+from anonymization.heuristic_validation import hasnum, hasproper
 
 def get_entity_positions(labels):
     if len(labels) == 0:
@@ -79,7 +80,8 @@ class LLMValidator:
             if positions:
                 for start, end in positions:
                     entity = bio2tag(ut_tokens[start:end], ut_labels[start:end])
-                    entities[-1].append((entity))
+                    if not hasproper(entity) and not hasnum(entity):
+                        entities[-1].append((entity))
         return entities, contexts, entity_positions
     
     def validate_entities(self, tokens, labels):
@@ -91,9 +93,10 @@ class LLMValidator:
         for i, _ in enumerate(entity_positions):
             for j, (start, end) in enumerate(entity_positions[i]):
                 verdict = verdicts[n]
+                print(entities[i][j], verdict)
                 if verdict is False:
-                    for j in range(start, end):
-                        validated_labels[i][j] = "O"
+                    for k in range(start, end):
+                        validated_labels[i][k] = "O"
                 n+=1
                 
         return validated_labels
