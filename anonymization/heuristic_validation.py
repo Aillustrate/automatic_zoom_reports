@@ -9,7 +9,7 @@ def hasproper(entity):
     return False
 
 def hasnum(entity):
-    num_pattern = re.compile("\d*")
+    num_pattern = re.compile("\d+")
     if num_pattern.search(entity):
         return True
     return False
@@ -21,4 +21,4 @@ if __name__ == "__main__":
     assert hasproper('ООО "Пивозавр"') == True
     assert hasnum('23') == True
     assert hasnum('дом 15') == True
-    assert hasnum('ООО "Пивозавр"') == True
+    assert hasnum('ООО "Пивозавр"') == False
