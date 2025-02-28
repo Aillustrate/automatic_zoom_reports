@@ -6,7 +6,7 @@ def hasproper(entity):
     for word in entity.split():
         if word[0].istitle():
             return True
-        if word.startswith('"') or word.startswith("'"):
+        if word.startswith('"') or word.startswith("'") or word.startswith("«"):
             return True
     return False
 
