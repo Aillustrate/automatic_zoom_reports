@@ -6,7 +6,7 @@ def hasproper(entity):
     for word in entity.split():
         if word[0].istitle():
             return True
-        if word.startswith('"'):
+        if word.startswith('"') or word.startswith("'"):
             return True
     return False
 
@@ -23,6 +23,7 @@ if __name__ == "__main__":
     assert hasproper("<person>Аня") == True
     assert hasproper("<org>VK</org>") == True
     assert hasproper('ООО "Пивозавр"') == True
+    assert hasproper("ООО 'Пивозавр") == True
     assert hasnum('23') == True
     assert hasnum('дом 15') == True
     assert hasnum('ООО "Пивозавр"') == False
