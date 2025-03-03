@@ -40,13 +40,13 @@ class LLMValidator:
 
     def get_prompt(self, entity, context):
         if "<money>" in entity:
-            prefix = "Ответь YES, если сущность содержит денежную сумму, NO - иначе."
+            prefix = "Ответь YES, если сущность содержит денежную сумму или большое число, NO - иначе."
         if "<person>" in entity:
             prefix = "Ответь YES, если сущность содержит указания на личность человека (например, имя, фамилию или отчество), NO - иначе."
         if "<address>" in entity:
             prefix = "Ответь YES, если сущность содержит адрес (например, город, район, улица или номер дома), NO - иначе."
         if "<org>" in entity:
-            prefix = "Ответь YES, если сущность содержит название организации (имя собственное), NO - иначе."
+            prefix = "Ответь YES, если сущность содержит имя собственное, NO - иначе."
         else:
             prefix = "Ответь YES, если сущность является конфиденциальной информацией и явялется именем собственным, NO - если сущность НЕ является конфиденциальной информацией или не является именем собственным."
         prompt = f"""{prefix}
@@ -122,3 +122,5 @@ if __name__ == "__main__":
     tokens, labels, entity_nums = tag2bio(text)
     validator = LLMValidator(None)
     print(validator.validate_entities([tokens], [labels]))
+    
+    
