@@ -74,6 +74,43 @@ def correct_labels(labels):
             correct_labels.append(label)
         prev_tag = tag
     return correct_labels
+
+def apply_label_mapping(label):
+    tag_mapping = {
+        "ORGANIZATION": "ORG",
+        "FAC": "ORG",
+        "NEWS_SOURCE": "ORG",
+        "CITY": "ADDRESS",
+        "STREET": "ADDRESS",
+        "VILLAGE": "ADDRESS",
+        "REGION": "ADDRESS",
+        "LOCATION": "ADDRESS",
+        "BOROUGH": "ADDRESS",
+        "HOUSE": "ADDRESS",
+        "CARDINAL":"ADDRESS",
+        "GPE": "ADDRESS",
+        "PRICE": "MONEY",
+        "INVESTMENT_PROGRAM": "MONEY",
+        "PENALTY": "MONEY",
+        "QUANTITY": "MONEY",
+        "CURRENCY": "MONEY"
+    }
+    if label.startswith("B") or label.startswith("I"):
+        index, tag = label.split('-')
+        new_tag = tag_mapping.get(tag, tag)
+        return f"{index}-{new_tag}"
+    return label
+
+def postprocess_preds(pred_labels, map_labels=True, remove_extra=True):
+    allowed_tags = ["ORG", "PERSON", "ADDRESS", "MONEY", "O"]
+    processed_labels = []
+    for i, label in enumerate(pred_labels):
+        new_label = apply_label_mapping(label) if map_labels else label
+        if remove_extra and new_label.split('-')[-1] not in allowed_tags:
+            new_label = "O"
+        processed_labels.append(new_label)
+    processed_labels = correct_labels(processed_labels)
+    return processed_labels
             
 
 
