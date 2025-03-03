@@ -29,33 +29,51 @@ def get_verdicts(logprobs, th = 0.5):
                     verdict = False
         verdicts.append(verdict)
     return verdicts
-    
+
 
 
 class LLMValidator:
     def __init__(self, llm, logprobs=True):
         self.llm = llm #add model init in validator init
         self.logprobs = logprobs
-        
+
+
+    # def get_prompt(self, entity, context):
+    #     if "<money>" in entity:
+    #         prefix = "Ответь YES, если сущность содержит денежную сумму или большое число, NO - иначе."
+    #     if "<person>" in entity:
+    #         prefix = "Ответь YES, если сущность содержит указания на личность человека (например, имя, фамилию или отчество), NO - иначе."
+    #     if "<address>" in entity:
+    #         prefix = "Ответь YES, если сущность содержит адрес (например, город, район, улица или номер дома), NO - иначе."
+    #     if "<org>" in entity:
+    #         prefix = "Ответь YES, если сущность содержит имя собственное, NO - иначе."
+    #     else:
+    #         prefix = "Ответь YES, если сущность является конфиденциальной информацией и явялется именем собственным, NO - если сущность НЕ является конфиденциальной информацией или не является именем собственным."
+    #     prompt = f"""{prefix}
+    #     КОНТЕКСТ: {context}
+    #     СУЩНОСТЬ: {entity}
+    #     ОТВЕТ:"""
+    #     print(prompt)
+    #     return prompt
 
     def get_prompt(self, entity, context):
         if "<money>" in entity:
-            prefix = "Ответь YES, если сущность содержит денежную сумму или большое число, NO - иначе."
+            prefix = "Reply YES if the entity contains a monetary amount or a large number, NO otherwise."
         if "<person>" in entity:
-            prefix = "Ответь YES, если сущность содержит указания на личность человека (например, имя, фамилию или отчество), NO - иначе."
+            prefix = "Reply YES if the entity contains a personal name (e.g., name, surname, or patronymic), NO otherwise."
         if "<address>" in entity:
-            prefix = "Ответь YES, если сущность содержит адрес (например, город, район, улица или номер дома), NO - иначе."
+            prefix = "Reply YES if the entity contains an address (e.g., city, district, street, or house number), NO otherwise."
         if "<org>" in entity:
-            prefix = "Ответь YES, если сущность содержит имя собственное, NO - иначе."
+            prefix = "Reply YES if the entity contains a company name or any proper noun, NO otherwise."
         else:
-            prefix = "Ответь YES, если сущность является конфиденциальной информацией и явялется именем собственным, NO - если сущность НЕ является конфиденциальной информацией или не является именем собственным."
+            prefix = "Reply YES if the entity contains confidential information or a proper noun, NO otherwise."
+
         prompt = f"""{prefix}
-        КОНТЕКСТ: {context}
-        СУЩНОСТЬ: {entity}
-        ОТВЕТ:"""
-        print(prompt)
+        CONTEXT: {context}
+        ENTITY: {entity}
+        ANSWER:"""
         return prompt
-    
+
     def parse_responses(self, responses): #try logprobs
         verdicts = []
         for response in responses:
@@ -64,7 +82,7 @@ class LLMValidator:
             else:
                 verdicts.append(True)
         return verdicts
-            
+
     def judge(self, entities, contexts):
         prompts = [
             self.get_prompt(entity, context)
@@ -77,7 +95,7 @@ class LLMValidator:
             responses = self.llm.respond(prompts)
             verdicts = self.parse_responses(responses)
         return verdicts
-    
+
     def get_entities(self, tokens, labels):
         entities = []
         contexts = []
@@ -97,7 +115,7 @@ class LLMValidator:
             entity_positions.append(filtered_postitions)
         return entities, contexts, entity_positions
 
-    
+
     def validate_entities(self, tokens, labels):
         entities, contexts, entity_positions = self.get_entities(tokens, labels)
         verdicts = self.judge(entities, contexts)
@@ -112,7 +130,7 @@ class LLMValidator:
                     for k in range(start, end):
                         validated_labels[i][k] = "O"
                 n+=1
-                
+
         return validated_labels
 
 
@@ -122,5 +140,4 @@ if __name__ == "__main__":
     tokens, labels, entity_nums = tag2bio(text)
     validator = LLMValidator(None)
     print(validator.validate_entities([tokens], [labels]))
-    
-    
+
