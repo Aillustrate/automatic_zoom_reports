@@ -41,9 +41,9 @@ transcriber = Transcriber()
 transcription = transcriber.transcribe(audio_input_path)
 
 # save transcript in one of the formats
-transcription.to_html()
-transcription.to_txt()
-transcription.to_json()
+transcription.save_html()
+transcription.save_str()
+transcription.save_json()
 
 # set token_usage_report_path to keep track of gpt token usage
 token_usage_report_path = "token_usage.json"
