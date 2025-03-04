@@ -4,5 +4,5 @@ pyannote.audio
 python-dotenv
 pydub
 yt-dlp
-#git clone https://github.com/bond005/pisets.git
-#python -m pip install -r pisets/requirements.txt
+numpy==1.26.4
+moviepy==1.0.3

@@ -33,7 +33,7 @@ class Transcriber:
     def transcribe(self, input_path, from_video=False, verbose=True):
         VIDEO_FORMATS = ["mp4", "mkv", "avi"]
         AUDIO_FORMATS = ["wav", "mp3", "ogg", "flac"]
-        if from_video and input_path.split(".")[-1] in VIDEO_FORMATS:
+        if from_video or input_path.split(".")[-1] in VIDEO_FORMATS:
             if verbose:
                 print("Extracting audio from video...")
             input_path = extract_audio(input_path)
@@ -66,9 +66,9 @@ if __name__ == "__main__":
         args.input_path, from_video=args.from_video, verbose=args.verbose
     )
     if args.html_output:
-        transcription.to_html(args.html_output)
+        transcription.save_html(args.html_output)
     if args.txt_output:
-        transcription.to_txt(args.txt_output)
+        transcription.save_txt(args.txt_output)
     if args.json_output:
-        transcription.to_json(args.json_output)
+        transcription.save_json(args.json_output)
     print(transcription)
