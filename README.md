@@ -42,7 +42,7 @@ transcription = transcriber.transcribe(audio_input_path)
 
 # save transcript in one of the formats
 transcription.save_html()
-transcription.save_str()
+transcription.save_txt()
 transcription.save_json()
 
 # set token_usage_report_path to keep track of gpt token usage
