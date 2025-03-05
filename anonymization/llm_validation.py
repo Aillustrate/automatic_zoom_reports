@@ -2,6 +2,7 @@ from copy import deepcopy
 from anonymization.parse_dataset import bio2tag, tag2bio
 from anonymization.correct_labels import correct_labels
 from anonymization.heuristic_validation import hasnum, hasproper
+from anonymization.vllm_model import VLLMModel
 
 def get_entity_positions(labels):
     labels = correct_labels(labels)  # Correct labels before processing
@@ -35,28 +36,22 @@ def get_verdicts(logprobs, th = 0.5):
 
 
 class LLMValidator:
-    def __init__(self, llm, logprobs=True):
-        self.llm = llm #add model init in validator init
+    def __init__(self,
+                 llm=None,
+                 logprobs=True,
+                 model=None,
+                 tokenizer=None,
+                 system_prompt_path=None,
+                 **kwargs):
+        if llm:
+            self.llm = llm
+        else:
+            with open(system_prompt_path, "r") as f:
+                system_prompt = f.read()
+            self.llm = VLLMModel(model=model, tokenizer=tokenizer, system_prompt=system_prompt, **kwargs)
+
         self.logprobs = logprobs
 
-
-    # def get_prompt(self, entity, context):
-    #     if "<money>" in entity:
-    #         prefix = "Ответь YES, если сущность содержит денежную сумму или большое число, NO - иначе."
-    #     if "<person>" in entity:
-    #         prefix = "Ответь YES, если сущность содержит указания на личность человека (например, имя, фамилию или отчество), NO - иначе."
-    #     if "<address>" in entity:
-    #         prefix = "Ответь YES, если сущность содержит адрес (например, город, район, улица или номер дома), NO - иначе."
-    #     if "<org>" in entity:
-    #         prefix = "Ответь YES, если сущность содержит имя собственное, NO - иначе."
-    #     else:
-    #         prefix = "Ответь YES, если сущность является конфиденциальной информацией и явялется именем собственным, NO - если сущность НЕ является конфиденциальной информацией или не является именем собственным."
-    #     prompt = f"""{prefix}
-    #     КОНТЕКСТ: {context}
-    #     СУЩНОСТЬ: {entity}
-    #     ОТВЕТ:"""
-    #     print(prompt)
-    #     return prompt
 
     def get_prompt(self, entity, context):
         if "<money>" in entity:
