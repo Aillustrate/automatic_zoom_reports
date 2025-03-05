@@ -18,9 +18,10 @@ class LLMEntityInserter:
                 system_prompt = f.read()
             self.llm = VLLMModel(model=model, tokenizer=tokenizer, system_prompt=system_prompt, **kwargs)
 
-    def get_prompt(self, phrase, context):
+    def get_prompt(self, mapping, context):
+        phrase_mapping = ", ".join([f"{k} - {v}" for k, v in mapping.items()])"
             return f"""ПРЕДЛОЖЕНИЕ: {context}
-        ФРАЗА: {phrase}
+        ФРАЗЫ: {phrase_mapping}
         РЕЗУЛЬТАТ:"""
 
 
@@ -28,10 +29,11 @@ class LLMEntityInserter:
         nums_sents_to_replace = []
         prompts = []
         for i, sentence in enumerate(sentences):
-            for entity, phrase in mapping.items():
-                if entity in sentence:
-                    prompts.append(self.get_prompt(phrase, sentence))
-                    nums_sents_to_replace.append(i)
+            sentence_mapping = {k:v for k, v in mapping.items() if k in sentence}
+            prompts.append(self.get_prompt(sentence_mapping, sentence))
+            if len(sentence_mapping) > 0:  # Check if there are any entities to replace in the sentence
+                nums_sents_to_replace.append(i)
+        print(prompts[0])
         new_sentences = deepcopy(sentences)  # Create a deep copy to avoid modifying the original list
         generated_insertions = self.llm.respond(prompts)
         for i, replaced_sentence in zip(nums_sents_to_replace, generated_insertions):
@@ -49,8 +51,10 @@ def evaluate_entity_insertion(orig_texts, mapping, anonymized_texts, llm_entity_
             new_mapping[key] = change_case(value)
     deanonymized_texts = llm_entity_inserter.insert_entities(anonymized_texts, new_mapping)
     for true, pred in zip(orig_texts, deanonymized_texts):
-        if true == pred:
+        if true.lower() == pred.lower():
             correct += 1
+        else:
+            print(f"True: {true}, Pred: {pred}")
         total += 1
     return correct / total if total > 0 else 0.0
 
