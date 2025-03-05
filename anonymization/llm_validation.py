@@ -1,8 +1,10 @@
 from copy import deepcopy
 from anonymization.parse_dataset import bio2tag, tag2bio
+from anonymization.correct_labels import correct_labels
 from anonymization.heuristic_validation import hasnum, hasproper
 
 def get_entity_positions(labels):
+    labels = correct_labels(labels)  # Correct labels before processing
     if len(labels) == 0:
         return []
     positions = []

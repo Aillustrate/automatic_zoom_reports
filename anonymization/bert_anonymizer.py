@@ -1,11 +1,14 @@
 from typing import List, Union
-from tqdm.notebook import trange
+from tqdm import trange
 
 import torch
 from torch import nn
 from transformers import AutoTokenizer, AutoModelForTokenClassification
 
 from config import config
+from anonymization.tokenization_utils import split_punctuation
+
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def load_model_and_tokenizer(model_name_or_path=config.anonymization.model):
     model = AutoModelForTokenClassification.from_pretrained(model_name_or_path).to(DEVICE)
@@ -69,12 +72,17 @@ class BertAnonymizer:
             return [[output_tokens[t_i], output_preds[t_i]] for t_i in range(len(output_tokens))]
         return output_tokens, output_preds
 
-    def anonymize(self, tokens, labels):
+    def anonymize(self, tokens, labels=None):
+        all_preds = []
         for i in trange(len(tokens)):
-            true_tokens, true_labels = tokens[i], labels[i]
+            true_tokens = tokens[i]
+            true_labels = labels[i] if labels is not None else None
+            if labels is None and isinstance(true_tokens, str):
+                true_tokens = split_punctuation(true_tokens)
             pred_tokens, pred_labels = self.predict(true_tokens, output_together=False, glue_words=True)
             pred_labels = [ut_labels[0] for ut_labels in pred_labels]
-            return true_tokens, true_labels, pred_tokens, pred_labels
+            all_preds.append([true_tokens, true_labels, pred_tokens, pred_labels])
+        return all_preds
 
 
 

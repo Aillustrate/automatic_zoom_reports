@@ -1,6 +1,9 @@
 import re
 from collections import defaultdict, Counter
 
+from anonymization.postprocess_ner import correct_labels
+from anonymization.tokenization_utils import untokenize
+
 def tag2bio(text):
     import re
     # Dictionary to keep track of entity counts
@@ -56,12 +59,12 @@ def tag2bio(text):
     return tokens_list, tags_list, entity_numbers
 
 
-def untokenize(tokens):
-    text = " ".join(tokens)
-    text = text.replace(" </", "</")
-    text = re.sub("\s+", " ", text)
-    text = text.strip()
-    return text
+# def untokenize(tokens):
+#     text = " ".join(tokens)
+#     text = text.replace(" </", "</")
+#     text = re.sub("\s+", " ", text)
+#     text = text.strip()
+#     return text
 
 
 def bio2tag(tokens, labels):
@@ -99,7 +102,7 @@ def conll2bio(file_path):
             else:
                 tokens.append([])  # Start a new list for the next sentence
                 labels.append([])  # Start a new list for the next sentence
-
+    labels = [correct_labels(ut_labels) for ut_labels in labels]
     return tokens, labels
 
 
