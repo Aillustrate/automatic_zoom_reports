@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-from anonymization.llm_utils import VLLMModel
+from anonymization.vllm_model import VLLMModel
 from anonymization.anonymizer import Anonymizer
 
 class LLMEntityInserter:
@@ -39,10 +39,9 @@ class LLMEntityInserter:
         return new_sentences
 
 
-def evaluate_entity_insertion(orig_texts, mapping, anonymized_texts, change=False, model=None, tokenizer=None, system_prompt_path=None):
+def evaluate_entity_insertion(orig_texts, mapping, anonymized_texts, llm_entity_inserter, change=False):
     correct = 0
     total = 0
-    llm_entity_inserter = LLMEntityInserter(model=model, tokenizer=tokenizer, system_prompt_path=system_prompt_path)
     new_mapping = deepcopy(mapping)
     if change:
         from anonymization.case_changing import change_case
