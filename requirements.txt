@@ -6,3 +6,4 @@ pydub
 yt-dlp
 numpy==1.26.4
 moviepy==1.0.3
+httpx==0.27.2
