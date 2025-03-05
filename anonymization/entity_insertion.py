@@ -19,10 +19,10 @@ class LLMEntityInserter:
             self.llm = VLLMModel(model=model, tokenizer=tokenizer, system_prompt=system_prompt, **kwargs)
 
     def get_prompt(self, mapping, context):
-        phrase_mapping = ", ".join([f"{k} - {v}" for k, v in mapping.items()])"
-        return f"""ПРЕДЛОЖЕНИЕ: {context}
-        ФРАЗЫ: {phrase_mapping}
-        РЕЗУЛЬТАТ:"""
+        phrase_mapping = ", ".join([f"{k} - {v}" for k, v in mapping.items()])
+        return f"""CONTEXT: {context}
+        PHRASES: {phrase_mapping}
+        RESULT:"""
 
 
     def insert_entities(self, sentences, mapping):
@@ -30,9 +30,9 @@ class LLMEntityInserter:
         prompts = []
         for i, sentence in enumerate(sentences):
             sentence_mapping = {k:v for k, v in mapping.items() if k in sentence}
-            prompts.append(self.get_prompt(sentence_mapping, sentence))
             if len(sentence_mapping) > 0:  # Check if there are any entities to replace in the sentence
                 nums_sents_to_replace.append(i)
+                prompts.append(self.get_prompt(sentence_mapping, sentence))
         print(prompts[0])
         new_sentences = deepcopy(sentences)  # Create a deep copy to avoid modifying the original list
         generated_insertions = self.llm.respond(prompts)
