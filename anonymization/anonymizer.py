@@ -4,26 +4,24 @@ from collections import defaultdict
 from anonymization.tokenization_utils import untokenize
 from anonymization.postprocess_ner import postprocess_preds
 from anonymization.parse_dataset import bio2tag
-
-def mask(tokens, labels):
-    text = []
-    for token, label in zip(tokens, labels):
-        if label.startswith("B-"):
-            tag = label.split("-")[1]
-            text.append(f"[{tag}]")
-        elif label.startswith("I-"):
-            continue
-        else:
-            text.append(token)
-    return untokenize(text)
+from anonymization.bert_anonymizer import BertAnonymizer
 
 
 def mask(tokens, labels):
+    if not isinstance(tokens[0], list):
+        tokens = [tokens]
+        labels = [labels]
+
+    entities = []
+    tagged_sequences = []
     per_class_mapping = defaultdict(set)
-    tag_pattern = re.compile('</?[a-z]+>')
-    entity_pattern = re.compile('<[a-z]+>.+?</[a-z]+>')
-    tagged_sequence = bio2tag(tokens, labels)
-    entities = entity_pattern.findall(tagged_sequence)
+    for ut_tokens, ut_labels in zip(tokens, labels):
+        tag_pattern = re.compile('</?[a-z]+>')
+        entity_pattern = re.compile('<[a-z]+>.+?</[a-z]+>')
+        tagged_sequence = bio2tag(ut_tokens, ut_labels)
+        tagged_sequences.append(tagged_sequence)
+        entities.extend(entity_pattern.findall(tagged_sequence))
+
     for entity in entities:
         tag = entity.split(">")[0].replace("<", "")
         content = re.sub(tag_pattern, "", entity).strip()
@@ -35,20 +33,24 @@ def mask(tokens, labels):
             entity_mask = f"[{tag.upper()}_{i}]"
             mapping[entity_mask] = entity
             tagged_entity = f"<{tag}>{entity}</{tag}>"
-            tagged_sequence = re.sub(tagged_entity, entity_mask, tagged_sequence)
+            for i in range(len(tagged_sequences)):
+                tagged_sequences[i] = re.sub(tagged_entity, entity_mask, tagged_sequences[i])
 
-    return mapping, tagged_sequence
-
-
-
-
+    return mapping, tagged_sequences
 
 
 
 class Anonymizer:
-    def __init__(self, bert, llm=None):
-        self.bert = bert
-        self.llm = llm
+    def __init__(self, bert, llm=None, use_llm=False):
+        if bert is None:
+            self.bert = BertAnonymizer()
+        else:
+            self.bert = bert
+        if llm is None and use_llm:
+            from anonymization.llm_validation import LLMValidator
+            self.llm = LLMValidator()
+        else:
+            self.llm = llm
 
     def anonymize(self, texts, do_mask=True):
         all_preds = self.bert.anonymize(texts)
@@ -59,7 +61,7 @@ class Anonymizer:
         if self.llm:
             predictions = self.llm.validate_entities(tokens, predictions)
         if do_mask:
-            return [mask(tokens[i], predictions[i]) for i in range(len(tokens))]
+            return mask(tokens, predictions)
         return tokens, predictions
 
 
