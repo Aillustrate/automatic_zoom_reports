@@ -41,7 +41,7 @@ def mask(tokens, labels):
 
 
 class Anonymizer:
-    def __init__(self, bert, llm=None, use_llm=False):
+    def __init__(self, bert=None, llm=None, use_llm=False):
         if bert is None:
             self.bert = BertAnonymizer()
         else:
