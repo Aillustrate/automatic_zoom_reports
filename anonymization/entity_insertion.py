@@ -20,7 +20,7 @@ class LLMEntityInserter:
 
     def get_prompt(self, mapping, context):
         phrase_mapping = ", ".join([f"{k} - {v}" for k, v in mapping.items()])"
-            return f"""ПРЕДЛОЖЕНИЕ: {context}
+        return f"""ПРЕДЛОЖЕНИЕ: {context}
         ФРАЗЫ: {phrase_mapping}
         РЕЗУЛЬТАТ:"""
 

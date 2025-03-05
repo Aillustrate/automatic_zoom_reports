@@ -1,7 +1,7 @@
 import random
 import pymorphy3
 
-from tokenization_utils import split_punctuation, untokenize
+from anonymization.tokenization_utils import split_punctuation, untokenize
 
 morph = pymorphy3.MorphAnalyzer()
 
@@ -11,7 +11,6 @@ random.seed(42)
 def change_case(phrase):
     CASES = ["nomn", "gent", "datv", "accs", "ablt", "loct"]
     new_case = random.choice(CASES)
-    print(new_case)
     inflected_phrase = []
     for word in split_punctuation(phrase).split():
         parsed_word = morph.parse(word)[0]

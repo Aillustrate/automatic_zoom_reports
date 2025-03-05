@@ -34,7 +34,7 @@ def mask(tokens, labels):
             mapping[entity_mask] = entity
             tagged_entity = f"<{tag}>{entity}</{tag}>"
             for i in range(len(tagged_sequences)):
-                tagged_sequences[i] = re.sub(tagged_entity, entity_mask, tagged_sequences[i])
+                tagged_sequences[i] = tagged_sequences[i].replace(tagged_entity, entity_mask)
 
     return mapping, tagged_sequences
 
