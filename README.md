@@ -28,7 +28,7 @@ bash install.sh
 4. Run via Python:
 ```python
 # import all needed modules
-from automatic_zoom_reports.asr.transriber import Transcriber
+from automatic_zoom_reports.asr.transcriber import Transcriber
 from automatic_zoom_reports.asr.transcription import Transcription
 from automatic_zoom_reports.summarization.summarizer import Summarizer
 from automatic_zoom_reports.summarization.summary import Summary
