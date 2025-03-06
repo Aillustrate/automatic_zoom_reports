@@ -50,11 +50,11 @@ def evaluate_entity_insertion(orig_texts, mapping, anonymized_texts, llm_entity_
         for key, value in mapping.items():
             new_mapping[key] = change_case(value)
     deanonymized_texts = llm_entity_inserter.insert_entities(anonymized_texts, new_mapping)
-    for true, pred in zip(orig_texts, deanonymized_texts):
+    for i, (true, pred) in enumerate(zip(orig_texts, deanonymized_texts)):
         if true.lower() == pred.lower():
             correct += 1
         else:
-            print(f"True: {true}, Pred: {pred}")
+            print(f"{i}\tTrue: {true}\n\tPred: {pred}")
         total += 1
     return correct / total if total > 0 else 0.0
 
