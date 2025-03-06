@@ -1,4 +1,5 @@
 import re
+from string import punctuation
 
 PAIRED_L2R = {'(': ')', '[': ']', '«': '»', '{': '}'}
 PAIRED_R2L = dict(zip(PAIRED_L2R.values(), PAIRED_L2R.keys()))
@@ -25,5 +26,11 @@ def untokenize(tokens) -> str:
 def split_punctuation(text):
     for punct in UNPAIRED_PUNCT:
         text = text.replace(punct, f" {punct} ")
+    text = re.sub("\s+", " ", text).strip()
+    return text
+
+def remove_punctuation(text):
+    for punct in punctuation:
+        text = text.replace(punct, " ")
     text = re.sub("\s+", " ", text).strip()
     return text

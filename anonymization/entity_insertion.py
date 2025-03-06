@@ -2,6 +2,7 @@ from copy import deepcopy
 
 from anonymization.vllm_model import VLLMModel
 from anonymization.anonymizer import Anonymizer
+from anonymization.tokenization_utils import remove_punctuation
 
 class LLMEntityInserter:
     def __init__(self,
@@ -41,6 +42,12 @@ class LLMEntityInserter:
         return new_sentences
 
 
+def compare_strings(str1, str2):
+    str1 = remove_punctuation(str1).lower()
+    str2 = remove_punctuation(str2).lower()
+    return str1 == str2
+
+
 def evaluate_entity_insertion(orig_texts, mapping, anonymized_texts, llm_entity_inserter, case="original"):
     correct = 0
     total = 0
@@ -51,7 +58,7 @@ def evaluate_entity_insertion(orig_texts, mapping, anonymized_texts, llm_entity_
             new_mapping[key] = change_case(value, case=case) # "random" or "nomn"
     deanonymized_texts = llm_entity_inserter.insert_entities(anonymized_texts, new_mapping)
     for i, (true, pred) in enumerate(zip(orig_texts, deanonymized_texts)):
-        if true.lower() == pred.lower():
+        if compare_strings(true, pred):
             correct += 1
         else:
             print(f"{i}\tTrue: {true}\n\tPred: {pred}")
