@@ -41,14 +41,14 @@ class LLMEntityInserter:
         return new_sentences
 
 
-def evaluate_entity_insertion(orig_texts, mapping, anonymized_texts, llm_entity_inserter, change=False):
+def evaluate_entity_insertion(orig_texts, mapping, anonymized_texts, llm_entity_inserter, case="original"):
     correct = 0
     total = 0
     new_mapping = deepcopy(mapping)
-    if change:
+    if case != "original":
         from anonymization.case_changing import change_case
         for key, value in mapping.items():
-            new_mapping[key] = change_case(value)
+            new_mapping[key] = change_case(value, case=case) # "random" or "nomn"
     deanonymized_texts = llm_entity_inserter.insert_entities(anonymized_texts, new_mapping)
     for i, (true, pred) in enumerate(zip(orig_texts, deanonymized_texts)):
         if true.lower() == pred.lower():
