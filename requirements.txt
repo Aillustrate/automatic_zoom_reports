@@ -1,8 +1,10 @@
 attrdict3
 openai==1.55.0
+httpx==0.27.2
 pyannote.audio
 python-dotenv
 pydub
 yt-dlp
+pyyaml
 numpy==1.26.4
 moviepy==1.0.3
