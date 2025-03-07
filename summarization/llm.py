@@ -10,20 +10,8 @@ class LLM:
     def __init__(
         self,
         token_usage_report_path,
-        system_prompt=None,
-        system_prompt_file=None,
         model_name=config.llm.model,
     ):
-        assert (
-            system_prompt or system_prompt_file
-        ), "Either system_prompt or system_prompt_path must be provided"
-        if system_prompt_file:
-            system_prompt_path = os.path.join(
-                config.llm.prompts_dir, system_prompt_file
-            )
-            with open(system_prompt_path, "r") as f:
-                system_prompt = f.read()
-        self.system_prompt = system_prompt
         self.model_name = model_name
         self.client = OpenAI(api_key=config.auth.openai_api_key)
         self.token_usage_report_path = token_usage_report_path
@@ -35,11 +23,11 @@ class LLM:
                 "total_completion_tokens": 0,
             }
 
-    def get_response(self, prompt):
+    def get_response(self, system_prompt, prompt):
         response = self.client.chat.completions.create(
             model=self.model_name,
             messages=[
-                {"role": "system", "content": self.system_prompt},
+                {"role": "system", "content": system_prompt},
                 {"role": "user", "content": prompt},
             ],
         )

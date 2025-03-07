@@ -5,7 +5,7 @@ from typing import Dict, List
 from summarization.output_validation import validate_structured_summary
 
 
-def parse_structured_summary(text) -> List[Dict[str, List[str]]]:
+def parse_json_structure(text) -> List[Dict[str, List[str]]]:
     text = re.sub(r'^```json', "", text)
     text = re.sub(r'```$', "", text)
     try:
@@ -14,9 +14,9 @@ def parse_structured_summary(text) -> List[Dict[str, List[str]]]:
         return []
 
 
-def process_keywords(keywords):
-    kw_list = keywords.split(",")
-    return [kw.strip() for kw in kw_list]
+def process_list_structure(entities):
+    entities_list = entities.split(",")
+    return [kw.strip() for kw in entities_list]
 
 
 if __name__ == "__main__":
@@ -69,5 +69,5 @@ if __name__ == "__main__":
 ]
 ```
 """
-    structured_summary = parse_structured_summary(text)
+    structured_summary = parse_json_structure(text)
     print(validate_structured_summary(structured_summary))
