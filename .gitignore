@@ -176,3 +176,19 @@ cython_debug/
 # other
 .DS_store
 */results
+
+.env
+.gitignore
+notebooks
+venv
+.DS_Store
+results
+__pycache__
+*.sh
+!install.sh
+*/deprecated
+*.json
+*.ipynb
+*.csv
+*.wav
+githib
