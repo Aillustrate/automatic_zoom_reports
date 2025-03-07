@@ -53,6 +53,9 @@ class Anonymizer:
             self.llm = llm
 
     def anonymize(self, texts, do_mask=True):
+        if isinstance(texts, str):
+            texts = [texts]
+
         all_preds = self.bert.anonymize(texts)
         tokens = [p[2] for p in all_preds]
         predictions = [p[3] for p in all_preds]
