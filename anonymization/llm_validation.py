@@ -119,13 +119,13 @@ class LLMValidator:
     def validate_entities(self, tokens, labels):
         entities, contexts, entity_positions = self.get_entities(tokens, labels)
         verdicts = self.judge(entities, contexts)
-        print(verdicts)
+        #print(verdicts)
         validated_labels = deepcopy(labels)
         n = 0
         for i, _ in enumerate(entity_positions):
             for j, (start, end) in enumerate(entity_positions[i]):
                 verdict = verdicts[n]
-                print(entities[i][j], verdict)
+                #print(entities[i][j], verdict)
                 if verdict is False:
                     for k in range(start, end):
                         validated_labels[i][k] = "O"
