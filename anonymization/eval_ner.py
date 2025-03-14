@@ -219,19 +219,38 @@ def per_class_token_metrics(predictions, ground_truth, strict=False, format="pd"
     return pd.DataFrame(per_class_metrics)
 
 def evaluate_ner(predictions, ground_truth, format="pd"):
+    metrics = {}
     show = display if format == "pd" else print
+
     print("Overall per token metrics:")
-    show(overall_token_metrics(predictions, ground_truth, format=format))
+    df = overall_token_metrics(predictions, ground_truth, format=format)
+    show(df)
+    metrics["overall_token_metrics"] = df.to_dict(orient="list")
+
     print("\nLoose overall entity metrics:")
-    show(entity_metrics(predictions, ground_truth, strict=False, format=format))
+    df = entity_metrics(predictions, ground_truth, strict=False, format=format)
+    show(df)
+    metrics["loose_overall_entity_metrics"] = df.to_dict(orient="list")
+
     print("\nStrict overall entity metrics:")
-    show(entity_metrics(predictions, ground_truth, strict=True, format=format))
+    df = entity_metrics(predictions, ground_truth, strict=True, format=format)
+    show(df)
+    metrics["strict_overall_entity_metrics"] = df.to_dict(orient="list")
+
     print("\nPer class per token metrics:")
-    show(per_class_token_metrics(predictions, ground_truth, format=format))
+    df = per_class_token_metrics(predictions, ground_truth, format=format)
+    show(df)
+    metrics["per_class_token_metrics"] = df.to_dict(orient="list")
+
     print("\nLoose per class entity metrics:")
-    show(per_class_entity_metrics(predictions, ground_truth, strict=False, format=format))
+    df = per_class_entity_metrics(predictions, ground_truth, strict=False, format=format)
+    show(df)
+    metrics["loose_per_class_entity_metrics"] = df.to_dict(orient="list")
+
     print("\nStrict per class entity metrics:")
-    show(per_class_entity_metrics(predictions, ground_truth, strict=True, format=format))
+    df = per_class_entity_metrics(predictions, ground_truth, strict=True, format=format)
+    show(df)
+    metrics["strict_per_class_entity_metrics"] = df.to_dict(orient="list")
 
 
 def show_false_negatives(predictions, ground_truth, tokens):
