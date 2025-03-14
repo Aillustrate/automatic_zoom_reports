@@ -1,5 +1,6 @@
 from copy import deepcopy
 
+from config import config
 from anonymization.vllm_model import VLLMModel
 from anonymization.anonymizer import Anonymizer
 from anonymization.tokenization_utils import remove_punctuation
@@ -10,7 +11,7 @@ class LLMEntityInserter:
                  logprobs=True,
                  model=None,
                  tokenizer=None,
-                 system_prompt_path=None,
+                 system_prompt_path=config.anonymization.llm_inserter_prompt_path,
                  **kwargs):
         if llm:
             self.llm = llm

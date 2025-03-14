@@ -1,4 +1,6 @@
 from copy import deepcopy
+
+from config import config
 from anonymization.parse_dataset import bio2tag, tag2bio
 from anonymization.postprocess_ner import correct_labels
 from anonymization.heuristic_validation import hasnum, hasproper
@@ -41,7 +43,7 @@ class LLMValidator:
                  logprobs=True,
                  model=None,
                  tokenizer=None,
-                 system_prompt_path=None,
+                 system_prompt_path=config.anonymization.llm_validator_prompt_path,
                  model_name_or_path=None,
                  **kwargs):
         if llm:
