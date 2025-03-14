@@ -14,7 +14,8 @@ class VLLMModel:
         model=None,
         tokenizer=None,
         model_name_or_path=None,
-        **generation_params
+        generation_params={},
+        vllm_params={}
     ):
         self.system_prompt = system_prompt
         self.model = model
@@ -25,7 +26,7 @@ class VLLMModel:
         if model is not None and tokenizer is not None:
             self.model, self.tokenizer = model, tokenizer
         else:
-            self.model, self.tokenizer = load_vllm_and_tokenizer(model_name_or_path)
+            self.model, self.tokenizer = load_vllm_and_tokenizer(model_name_or_path, **vllm_params)
 
 
     def get_prompt(self, text):
