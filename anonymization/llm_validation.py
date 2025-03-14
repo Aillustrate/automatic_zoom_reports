@@ -51,7 +51,7 @@ class LLMValidator:
         else:
             with open(system_prompt_path, "r") as f:
                 system_prompt = f.read()
-            self.llm = VLLMModel(model=model, tokenizer=tokenizer, system_prompt=system_prompt, model_name_or_path=None, **kwargs)
+            self.llm = VLLMModel(model=model, tokenizer=tokenizer, system_prompt=system_prompt, model_name_or_path=model_name_or_path, **kwargs)
 
         self.logprobs = logprobs
 
