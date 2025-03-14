@@ -3,7 +3,7 @@ from transformers import AutoTokenizer
 
 
 def load_vllm_and_tokenizer(model_name_or_path):
-    model = LLM.load(model_name_or_path)
+    model = LLM(model_name_or_path)
     tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
     return model, tokenizer
 
