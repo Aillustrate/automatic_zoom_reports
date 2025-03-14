@@ -74,7 +74,8 @@ class BertAnonymizer:
 
     def anonymize(self, tokens, labels=None):
         all_preds = []
-        for i in trange(len(tokens)):
+        it = trange(len(tokens)) if len(tokens) > 1 else range(len(tokens))
+        for i in it:
             true_tokens = tokens[i]
             true_labels = labels[i] if labels is not None else None
             if labels is None and isinstance(true_tokens, str):

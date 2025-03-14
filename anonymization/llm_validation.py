@@ -1,6 +1,6 @@
 from copy import deepcopy
 from anonymization.parse_dataset import bio2tag, tag2bio
-from anonymization.correct_labels import correct_labels
+from anonymization.postprocess_ner import correct_labels
 from anonymization.heuristic_validation import hasnum, hasproper
 from anonymization.vllm_model import VLLMModel
 
@@ -42,13 +42,14 @@ class LLMValidator:
                  model=None,
                  tokenizer=None,
                  system_prompt_path=None,
+                 model_name_or_path=None,
                  **kwargs):
         if llm:
             self.llm = llm
         else:
             with open(system_prompt_path, "r") as f:
                 system_prompt = f.read()
-            self.llm = VLLMModel(model=model, tokenizer=tokenizer, system_prompt=system_prompt, **kwargs)
+            self.llm = VLLMModel(model=model, tokenizer=tokenizer, system_prompt=system_prompt, model_name_or_path=None, **kwargs)
 
         self.logprobs = logprobs
 
