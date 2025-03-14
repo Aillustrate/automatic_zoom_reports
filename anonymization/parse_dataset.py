@@ -1,8 +1,28 @@
 import re
+import json
 from collections import defaultdict, Counter
 
 from anonymization.postprocess_ner import correct_labels
 from anonymization.tokenization_utils import untokenize
+
+def remove_tags(text):
+    tag_pattern = re.compile('</?[a-z]+>')
+    text = tag_pattern.sub("", text)
+    text = re.sub(r'\s+', ' ', text)
+    return text.strip()
+
+
+def parse_dialogs(file_path):
+    with open(file_path, 'r') as f:
+        data = json.load(f)
+    dialogs = []
+    for turns in data.values():
+        turns = [remove_tags(turn) for turn in turns]
+        turns = [f"- {utterance}" for utterance in turns]
+        dialogue = "\n".join(turns)
+        dialogs.append(dialogue)
+    return dialogs
+
 
 def tag2bio(text):
     import re
