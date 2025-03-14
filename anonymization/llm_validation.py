@@ -46,7 +46,7 @@ class LLMValidator:
                  system_prompt_path=config.anonymization.llm_validator_prompt_path,
                  model_name_or_path=None,
                  **kwargs):
-        if llm:
+        if llm is not None:
             self.llm = llm
         else:
             with open(system_prompt_path, "r") as f:
