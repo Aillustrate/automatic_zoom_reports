@@ -21,10 +21,13 @@ class LLMEntityInserter:
             self.llm = VLLMModel(model=model, tokenizer=tokenizer, system_prompt=system_prompt, **kwargs)
 
     def get_prompt(self, mapping, context):
-        phrase_mapping = ", ".join([f"{k} - {v}" for k, v in mapping.items()])
-        return f"""CONTEXT: {context}
-        PHRASES: {phrase_mapping}
-        RESULT:"""
+        # phrase_mapping = ", ".join([f"{k} - {v}" for k, v in mapping.items()])
+        # return f"""CONTEXT: {context}
+        # PHRASES: {phrase_mapping}
+        # RESULT:"""
+        for key, value in mapping.items():
+            context = context.replace(key, f"[{value}]")
+        return f"""SENTENCE: {context}\nRESULT: """
 
 
     def insert_entities(self, sentences, mapping):
@@ -44,8 +47,8 @@ class LLMEntityInserter:
 
 
 def compare_strings(str1, str2):
-    str1 = remove_punctuation(str1).lower().replace(" ", "")
-    str2 = remove_punctuation(str2).lower().replace(" ", "")
+    str1 = remove_punctuation(str1).lower().replace(" ", "").replace("\n", "")
+    str2 = remove_punctuation(str2).lower().replace(" ", "").replace("\n", "")
     return str1 == str2
 
 
