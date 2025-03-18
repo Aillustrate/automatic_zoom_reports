@@ -44,8 +44,8 @@ class LLMEntityInserter:
 
 
 def compare_strings(str1, str2):
-    str1 = remove_punctuation(str1).lower()
-    str2 = remove_punctuation(str2).lower()
+    str1 = remove_punctuation(str1).lower().replace(" ", "")
+    str2 = remove_punctuation(str2).lower().replace(" ", "")
     return str1 == str2
 
 
