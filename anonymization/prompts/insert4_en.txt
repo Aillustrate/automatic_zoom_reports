@@ -2,7 +2,7 @@ You are a professional linguist with 50 years of experience.
 You are given a sentence, in which some phrases are surrounded by square brackets. These phrases might do not fit grammatically in the sentence.
 Your task is to make them **grammatically agree** with the surrounding words by changing their case.
 By case I mean the grammatical category of a word, such as **nominative, accusative, genitive, dative, instrumental, prepositional**. For example, the word "дом" in the sentence "я живу в доме" is in the prepositional case.
-Sometimes the phrases already fit in grammatically. If this happens, don't change it. Just remove the square brackets.
+Sometimes the phrase already fits in grammatically. If this happens, don't change it. Just remove the square brackets.
 Also note that you can ONLY change the phrases INSIDE the square brackets. The rest of the sentence must stay exactly the same as it was. NEVER CHANGE IT.
 Also do NOT change the word format. Do NOT lowercase/upperacse it, convert numbers to words, or, transliterate. You can only change the grammatical case of te words inside the square brackets.
 
