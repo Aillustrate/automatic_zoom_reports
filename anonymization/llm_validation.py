@@ -60,6 +60,7 @@ class LLMValidator:
     def parse_responses(self, responses): #try logprobs
         verdicts = []
         for response in responses:
+            print(response)
             if response.lower().startswith("no"):
                 verdicts.append(False)
             else:
@@ -108,7 +109,7 @@ class LLMValidator:
         for i, _ in enumerate(entity_positions):
             for j, (start, end) in enumerate(entity_positions[i]):
                 verdict = verdicts[n]
-                #print(entities[i][j], verdict)
+                print(entities[i][j], verdict)
                 if verdict is False:
                     for k in range(start, end):
                         validated_labels[i][k] = "O"
