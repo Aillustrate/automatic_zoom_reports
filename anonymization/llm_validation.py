@@ -1,27 +1,10 @@
 from copy import deepcopy
 
 from config import config
-from anonymization.parse_dataset import bio2tag, tag2bio
+from anonymization.parse_dataset import bio2tag, tag2bio, get_entity_positions
 from anonymization.postprocess_ner import correct_labels
 from anonymization.heuristic_validation import hasnum, hasproper
 from anonymization.vllm_model import VLLMModel
-
-def get_entity_positions(labels):
-    labels = correct_labels(labels)  # Correct labels before processing
-    if len(labels) == 0:
-        return []
-    positions = []
-    prev_tag = "O"
-    for i, label in enumerate(labels):
-        tag = label.split("-")[-1]
-        if tag != prev_tag and prev_tag != "O":
-            positions[-1].append(i)
-        if label.startswith("B-"):
-            positions.append([i])
-        prev_tag = tag
-    if label != "O":
-        positions[-1].append(i)
-    return positions
 
 
 def get_verdicts(logprobs, th = 0.5):

@@ -3,8 +3,7 @@ import warnings
 from collections import defaultdict
 import pandas as pd
 
-from anonymization.llm_validation import get_entity_positions
-from anonymization.parse_dataset import bio2tag
+from anonymization.parse_dataset import bio2tag, get_entity_positions
 
 def entity_metrics(predictions, ground_truth, strict=True, format="pd"):
     correct_entities = 0
@@ -225,32 +224,33 @@ def evaluate_ner(predictions, ground_truth, format="pd"):
     print("Overall per token metrics:")
     df = overall_token_metrics(predictions, ground_truth, format=format)
     show(df)
-    metrics["overall_token_metrics"] = df.to_dict(orient="list")
+    metrics["overall_token_metrics"] = df
 
     print("\nLoose overall entity metrics:")
     df = entity_metrics(predictions, ground_truth, strict=False, format=format)
     show(df)
-    metrics["loose_overall_entity_metrics"] = df.to_dict(orient="list")
+    metrics["loose_overall_entity_metrics"] = df
 
     print("\nStrict overall entity metrics:")
     df = entity_metrics(predictions, ground_truth, strict=True, format=format)
     show(df)
-    metrics["strict_overall_entity_metrics"] = df.to_dict(orient="list")
+    metrics["strict_overall_entity_metrics"] = df
 
     print("\nPer class per token metrics:")
     df = per_class_token_metrics(predictions, ground_truth, format=format)
     show(df)
-    metrics["per_class_token_metrics"] = df.to_dict(orient="list")
+    metrics["per_class_token_metrics"] = df
 
     print("\nLoose per class entity metrics:")
     df = per_class_entity_metrics(predictions, ground_truth, strict=False, format=format)
     show(df)
-    metrics["loose_per_class_entity_metrics"] = df.to_dict(orient="list")
+    metrics["loose_per_class_entity_metrics"] = df
 
     print("\nStrict per class entity metrics:")
     df = per_class_entity_metrics(predictions, ground_truth, strict=True, format=format)
     show(df)
-    metrics["strict_per_class_entity_metrics"] = df.to_dict(orient="list")
+    metrics["strict_per_class_entity_metrics"] = df
+    return metrics
 
 
 def show_false_negatives(predictions, ground_truth, tokens):

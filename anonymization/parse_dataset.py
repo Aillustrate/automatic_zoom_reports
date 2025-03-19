@@ -5,6 +5,24 @@ from collections import defaultdict, Counter
 from anonymization.postprocess_ner import correct_labels
 from anonymization.tokenization_utils import untokenize
 
+def get_entity_positions(labels):
+    labels = correct_labels(labels)  # Correct labels before processing
+    if len(labels) == 0:
+        return []
+    positions = []
+    prev_tag = "O"
+    for i, label in enumerate(labels):
+        tag = label.split("-")[-1]
+        if tag != prev_tag and prev_tag != "O":
+            positions[-1].append(i)
+        if label.startswith("B-"):
+            positions.append([i])
+        prev_tag = tag
+    if label != "O":
+        positions[-1].append(i)
+    return positions
+
+
 def remove_tags(text):
     tag_pattern = re.compile('</?[a-z]+>')
     text = tag_pattern.sub("", text)
