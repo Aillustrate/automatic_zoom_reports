@@ -110,14 +110,14 @@ class Summary:
         <b>Дата:</b> {creation_date}<br>
         <b>Участники:</b> {speakers}<br>
         """
-        
+
         for section_id, content in self.sections.items():
             header = content['name']
             summary_template += f'<br><br><b>{header}:</b><br>{{{section_id}}}'
 
         if include_full_transcript:
             summary_template += "<br><br><b>Расшифровка</b><br>{transcript}"
-        
+
         summary_template += "</body></html>"
         format_args = self.to_dict(
             include_full_transcript=include_full_transcript, transcript_format="html"
@@ -144,6 +144,13 @@ class Summary:
         assert output_path.endswith(".html"), "Output path must end with .html"
         with open(output_path, "w") as f:
             f.write(self.to_html(include_full_transcript=True))
+        logging.info(f"Summary saved to {output_path}")
+
+    def save_pdf(self, output_path: str = "summary.txt"):
+        from summarization.pdfutils import html2pdf
+        assert output_path.endswith(".pdf"), "Output path must end with .pdf"
+        html_content = self.to_html(include_full_transcript=True)
+        html2pdf(html_content, output_path)
         logging.info(f"Summary saved to {output_path}")
 
     # TODO: подумать нужна ли вообще эта ф-я
@@ -245,3 +252,4 @@ if __name__ == "__main__":
     summary.save_html("summarization/results/summary.html")
     summary.save_txt("summarization/results/summary.txt")
     summary.save_json("summarization/results/summary.json")
+    summary.save_pdf("summarization/results/summary.pdf")
