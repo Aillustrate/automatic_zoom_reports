@@ -55,6 +55,8 @@ class LLMValidator:
         CONTEXT: {context}
         ENTITY: {entity}
         ANSWER:"""
+        if "Qwen3" in str(self.llm.model_name_or_path):
+            prompt += " /no_think"
         return prompt
 
     def parse_responses(self, responses): #try logprobs
