@@ -27,7 +27,10 @@ class LLMEntityInserter:
         # RESULT:"""
         for key, value in mapping.items():
             context = context.replace(key, f"[{value}]")
-        return f"""SENTENCE: {context}\nRESULT: """
+        prompt = f"""SENTENCE: {context}\nRESULT: """
+        if "Qwen3" in str(self.llm.model_name_or_path):
+            prompt += " /no_think"
+        return prompt
 
 
     def insert_entities(self, sentences, mapping):
