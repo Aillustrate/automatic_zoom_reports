@@ -1,11 +1,21 @@
+import re
+
 from vllm import SamplingParams, LLM
 from transformers import AutoTokenizer
+
+def remove_thinking(text):
+        matches = re.findall(r"<think>.*?</think>(.*)", text, re.DOTALL)
+        if matches:
+            text = matches[0]
+            return text.strip()
+        return text
 
 
 def load_vllm_and_tokenizer(model_name_or_path, **kwargs):
     model = LLM(model_name_or_path, dtype="half", **kwargs)
     tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
     return model, tokenizer
+
 
 class VLLMModel:
     def __init__(
@@ -81,8 +91,8 @@ class VLLMModel:
             texts = [texts]
             print(single)
         prompt_tokens = self.get_prompt_tokens(texts)
-        print(len(prompt_tokens))
         assistant_messages = self.generate_answers(prompt_tokens)
+        assistant_messages = [remove_thinking(text) for text in assistant_messages]
         if single:
             return assistant_messages[0]
         return assistant_messages
