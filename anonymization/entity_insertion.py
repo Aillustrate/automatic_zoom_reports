@@ -45,8 +45,8 @@ class LLMEntityInserter:
         new_sentences = deepcopy(sentences)  # Create a deep copy to avoid modifying the original list
         generated_insertions = self.llm.respond(prompts)
         generated_insertions = [remove_thinking(text) for text in generated_insertions]
-        # for i, replaced_sentence in zip(nums_sents_to_replace, generated_insertions):
-        #     new_sentences[i] = replaced_sentence.split("\n")[0]  # Take the first line of the generated text
+        for i, replaced_sentence in zip(nums_sents_to_replace, generated_insertions):
+            new_sentences[i] = replaced_sentence.split("\n")[0]  # Take the first line of the generated text
         return new_sentences
 
 
