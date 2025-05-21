@@ -3,7 +3,7 @@ import json
 from collections import defaultdict, Counter
 
 from anonymization.postprocess_ner import correct_labels
-from anonymization.tokenization_utils import untokenize
+from anonymization.utils import untokenize
 
 def get_entity_positions(labels):
     labels = correct_labels(labels)  # Correct labels before processing

@@ -3,32 +3,8 @@ from copy import deepcopy
 
 from config import config
 from anonymization.vllm_model import VLLMModel, remove_thinking
-from anonymization.anonymizer import Anonymizer
-from anonymization.tokenization_utils import remove_punctuation
 from summarization.summary import Summary
-
-def compare_strings(str1, str2):
-    str1 = remove_punctuation(str1).lower().replace(" ", "").replace("\n", "")
-    str2 = remove_punctuation(str2).lower().replace(" ", "").replace("\n", "")
-    return str1 == str2
-
-
-def evaluate_entity_insertion(orig_texts, mapping, anonymized_texts, llm_entity_inserter, case="original"):
-    correct = 0
-    total = 0
-    new_mapping = deepcopy(mapping)
-    if case != "original":
-        from anonymization.case_changing import change_case
-        for key, value in mapping.items():
-            new_mapping[key] = change_case(value, case=case) # "random" or "nomn"
-    deanonymized_texts = llm_entity_inserter.insert_entities(anonymized_texts, new_mapping)
-    for i, (true, pred) in enumerate(zip(orig_texts, deanonymized_texts)):
-        if compare_strings(true, pred):
-            correct += 1
-        else:
-            print(f"{i}\tTrue: {true}\n\tPred: {pred}")
-        total += 1
-    return correct / total if total > 0 else 0.0
+from anonymization.utils import compare_strings
 
 
 class BaseDeanonymizer(ABC):

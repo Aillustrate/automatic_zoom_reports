@@ -1,9 +1,10 @@
+import re
 from copy import deepcopy
 
 from config import config
-from anonymization.parse_dataset import bio2tag, tag2bio, get_entity_positions
+from anonymization.data_utils import bio2tag, tag2bio, get_entity_positions
 from anonymization.postprocess_ner import correct_labels
-from anonymization.heuristic_validation import hasnum, hasproper
+from anonymization.utils import hasnum, hasproper
 from anonymization.vllm_model import VLLMModel
 
 
@@ -17,7 +18,6 @@ def get_verdicts(logprobs, th = 0.5):
                     verdict = False
         verdicts.append(verdict)
     return verdicts
-
 
 
 class LLMValidator:
