@@ -73,6 +73,7 @@ def entity_metrics(predictions, ground_truth, strict=True, format="pd"):
         return metrics
     return pd.DataFrame({"score": {metric: score for metric, score in metrics.items()}})
 
+
 def per_class_entity_metrics(predictions, ground_truth, strict=True, format="pd"):
     correct_entities = defaultdict(int)
     total_true_entities = defaultdict(int)
@@ -146,6 +147,7 @@ def per_class_entity_metrics(predictions, ground_truth, strict=True, format="pd"
         return per_class_metrics
     return pd.DataFrame(per_class_metrics)
 
+
 def overall_token_metrics(predictions, ground_truth, format="pd"):
     correct_predicted = 0
     total_predicted = 0
@@ -184,6 +186,7 @@ def overall_token_metrics(predictions, ground_truth, format="pd"):
         return metrics
     return pd.DataFrame({"score": {metric: score for metric, score in metrics.items()}})
 
+
 def per_class_token_metrics(predictions, ground_truth, strict=False, format="pd"):
     correct_tokens = defaultdict(int)
     total_true_tokens = defaultdict(int)
@@ -216,6 +219,7 @@ def per_class_token_metrics(predictions, ground_truth, strict=False, format="pd"
     if format == "json":
         return per_class_metrics
     return pd.DataFrame(per_class_metrics)
+
 
 def evaluate_ner(predictions, ground_truth, format="pd"):
     metrics = {}

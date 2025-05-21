@@ -20,8 +20,8 @@ def html2pdf(html_content, output_path):
 
 
 if __name__ == "__main__":
-    path =  'summarization/results/summary.html'
+    path =  'summarization/results/summary_fixed.html'
 
     with open(path) as f:
         html_content = f.read()
-    asyncio.get_event_loop().run_until_complete(generate_pdf_from_html(html_content, 'example.pdf'))
+    asyncio.get_event_loop().run_until_complete(generate_pdf_from_html(html_content, 'example2.pdf'))

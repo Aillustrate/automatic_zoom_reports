@@ -5,43 +5,13 @@ from anonymization.tokenization_utils import untokenize
 from anonymization.postprocess_ner import postprocess_preds
 from anonymization.parse_dataset import bio2tag
 from anonymization.bert_anonymizer import BertAnonymizer
+from anonymization.normalization import Normalizer
 
-
-def mask(tokens, labels):
-    if not isinstance(tokens[0], list):
-        tokens = [tokens]
-        labels = [labels]
-
-    entities = []
-    tagged_sequences = []
-    per_class_mapping = defaultdict(set)
-    for ut_tokens, ut_labels in zip(tokens, labels):
-        tag_pattern = re.compile('</?[a-z]+>')
-        entity_pattern = re.compile('<[a-z]+>.+?</[a-z]+>')
-        tagged_sequence = bio2tag(ut_tokens, ut_labels)
-        tagged_sequences.append(tagged_sequence)
-        entities.extend(entity_pattern.findall(tagged_sequence))
-
-    for entity in entities:
-        tag = entity.split(">")[0].replace("<", "")
-        content = re.sub(tag_pattern, "", entity).strip()
-        per_class_mapping[tag].add(content)
-
-    mapping = {}
-    for tag, entities in per_class_mapping.items():
-        for i, entity in enumerate(entities):
-            entity_mask = f"[{tag.upper()}_{i}]"
-            mapping[entity_mask] = entity
-            tagged_entity = f"<{tag}>{entity}</{tag}>"
-            for i in range(len(tagged_sequences)):
-                tagged_sequences[i] = tagged_sequences[i].replace(tagged_entity, entity_mask)
-
-    return mapping, tagged_sequences
 
 
 
 class Anonymizer:
-    def __init__(self, bert=None, llm=None, use_llm=False):
+    def __init__(self, bert=None, llm=None, use_llm=False, do_normalize=True):
         if bert is None:
             self.bert = BertAnonymizer()
         else:
@@ -51,6 +21,42 @@ class Anonymizer:
             self.llm = LLMValidator()
         else:
             self.llm = llm
+        self.normalizer = Normalizer()
+        self.do_normalize = do_normalize
+        if self.do_normalize:
+            self.normalizer.init_spacy()
+
+    def mask(self, tokens, labels):
+        if not isinstance(tokens[0], list):
+            tokens = [tokens]
+            labels = [labels]
+
+        entities = []
+        tagged_sequences = []
+        per_class_mapping = defaultdict(set)
+        for ut_tokens, ut_labels in zip(tokens, labels):
+            tag_pattern = re.compile('</?[a-z]+>')
+            entity_pattern = re.compile('<[a-z]+>.+?</[a-z]+>')
+            tagged_sequence = bio2tag(ut_tokens, ut_labels)
+            tagged_sequences.append(tagged_sequence)
+            entities.extend(entity_pattern.findall(tagged_sequence))
+
+        for entity in entities:
+            tag = entity.split(">")[0].replace("<", "")
+            content = re.sub(tag_pattern, "", entity).strip()
+            per_class_mapping[tag].add(content)
+
+        mapping = {}
+        for tag, entities in per_class_mapping.items():
+            for i, entity in enumerate(entities):
+                norm_entity = self.normalizer.normalize(entity) if self.do_normalize else entity
+                entity_mask = f"[{tag.upper()}_{i}]"
+                mapping[entity_mask] = norm_entity
+                tagged_entity = f"<{tag}>{entity}</{tag}>"
+                for i in range(len(tagged_sequences)):
+                    tagged_sequences[i] = tagged_sequences[i].replace(tagged_entity, entity_mask)
+
+        return mapping, tagged_sequences
 
     def anonymize(self, texts, do_mask=True):
         if isinstance(texts, str):
@@ -64,7 +70,7 @@ class Anonymizer:
         if self.llm:
             predictions = self.llm.validate_entities(tokens, predictions)
         if do_mask:
-            return mask(tokens, predictions)
+            return self.mask(tokens, predictions)
         return tokens, predictions
 
 

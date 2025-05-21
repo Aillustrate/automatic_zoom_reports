@@ -4,7 +4,7 @@ from config import config
 from anonymization.vllm_model import VLLMModel, remove_thinking
 from anonymization.anonymizer import Anonymizer
 from anonymization.tokenization_utils import remove_punctuation
-
+from summarization.summary import Summary
 class LLMEntityInserter:
     def __init__(self,
                  llm=None,
@@ -48,6 +48,31 @@ class LLMEntityInserter:
         for i, replaced_sentence in zip(nums_sents_to_replace, generated_insertions):
             new_sentences[i] = replaced_sentence.split("\n")[0]  # Take the first line of the generated text
         return new_sentences
+
+    def deanonymize(self, summary:Summary, mapping):
+        summary_dict = deepcopy(summary.to_dict())
+        for section_id, content in summary_dict.items():
+            if section_id not in ["creation_date", "speakers", "transcript"]:
+                content = content["content"]
+                if isinstance(content, list):
+                    new_content = []
+                    for element in content:
+                        if isinstance(element, dict):
+                            new_element = {}
+                            assert "topic" in element and "points" in element
+                            new_element["points"] = self.insert_entities(element["points"], mapping)
+                            new_element["topic"] = self.insert_entities([element["topic"]], mapping)[0]
+                        elif isinstance(element, str):
+                            new_element = self.insert_entities([element], mapping)[0]
+                        else:
+                            raise ValueError(f"Unknown element type: {type(element)}")
+                        new_content.append(new_element)
+                elif isinstance(content, str):
+                    new_content = self.insert_entities([content], mapping)[0]
+                else:
+                    raise ValueError(f"Unknown content type: {type(content)}")
+                summary_dict[section_id]["content"] = new_content
+        return Summary.from_dict(summary_dict)
 
 
 def compare_strings(str1, str2):

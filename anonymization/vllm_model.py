@@ -58,6 +58,7 @@ class VLLMModel:
             self.tokenizer.encode(
                 self.tokenizer.apply_chat_template(messages, add_generation_prompt=add_generation_prompt, tokenize=False),
                 add_special_tokens=True,
+
             )
             for messages in messages_list
         ]

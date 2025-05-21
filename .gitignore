@@ -192,3 +192,5 @@ __pycache__
 *.csv
 *.wav
 githib
+*.pdf
+experiment_results
