@@ -18,6 +18,7 @@ class Summary:
         self,
         sections: Dict[str, Any],
         transcription: Union[Transcription, List[Dict[str, Any]], str],
+        creation_date: Optional[str] = None,
     ):
         """
         Args:
@@ -25,10 +26,19 @@ class Summary:
             transcription: Транскрипция встречи
         """
         self.sections = sections
-        self.transcription, self.transcript = load_transcription_and_transcript(
-            transcription
-        )
-        self._creation_date = datetime.datetime.now().strftime("%d.%m.%Y %H:%M:%S")
+        if transcription is not None:
+            self.set_transcription(transcription)
+        else:
+            warnings.warn("Transcription is None. Please add transcription via `set_transcription` method")
+            self.transcription = None
+            self.transcript = None
+        if creation_date:
+            self._creation_date = creation_date
+        else:
+            self._creation_date = datetime.datetime.now().strftime("%d.%m.%Y %H:%M:%S")
+
+    def set_transcription(self, transcription):
+        self.transcription, self.transcript = load_transcription_and_transcript(transcription)
 
     def json_structure_to_str(self, structure_content):
         structure_content_str = ""
@@ -50,39 +60,55 @@ class Summary:
             structure_content_html += f"<br><b>{topic['topic']}:</b><ul>{points_str}</ul>"
         return structure_content_html
 
-    def to_dict(self, include_full_transcript: bool = True, transcript_format: str = "dict") -> Dict:
-        data = {}
-        data['creation_date']= self._creation_date
-        if transcript_format == "html":
-            data['speakers'] = self.transcription.get_speaker_ledgend()
-            for section_id, content in self.sections.items():
-                if content['type'] == 'json':
-                    data[section_id] = self.json_structure_to_html(content['content'])
-                elif content['type'] == 'list':
-                    data[section_id] = ", ".join(content['content'])
-                else:
-                    data[section_id] = content['content']
-        elif transcript_format == "str":
-            data['speakers'] = ", ".join(self.transcription.speakers)
-            for section_id, content in self.sections.items():
-                if content['type'] == 'json':
-                    data[section_id] = self.json_structure_to_str(content['content'])
-                elif content['type'] == 'list':
-                    data[section_id] = ", ".join(content['content'])
-                else:
-                    data[section_id] = content['content']
+    def convert_content(self, content, content_format="dict"):
+        if content_format == "html":
+            if content['type'] == 'json':
+                return self.json_structure_to_html(content['content'])
+            elif content['type'] == 'list':
+                return ", ".join(content['content'])
+            else:
+                return content['content']
+
+        elif content_format == "str":
+            if content['type'] == 'json':
+                return self.json_structure_to_str(content['content'])
+            elif content['type'] == 'list':
+                return ", ".join(content['content'])
+            else:
+                return content['content']
+
+        elif content_format == "dict":
+            return content
+
+    def convert_transcription(self, content_format="dict"):
+        if content_format == "html":
+            speakers = self.transcription.get_speaker_ledgend()
+            transcription = self.transcription.to_html()
+        elif content_format == "str":
+             speakers = ", ".join(self.transcription.speakers)
+             transcription = self.transcription.to_str()
         else:
-            data['speakers'] = self.transcription.speakers
-            for section_id, content in self.sections.items():
-                data[section_id] = content['content']
+            speakers = self.transcription.speakers
+            transcription = self.transcription.to_dict()
+        return speakers, transcription
+
+    def to_dict(self, include_full_transcript: bool = True, content_format: str = "dict") -> Dict:
+        speakers, transcription = self.convert_transcription(content_format=content_format)
+        data = {
+            "creation_date": self._creation_date,
+            "speakers": speakers,
+            "sections": {}
+            }
+
+        for section_id, content in self.sections.items():
+            converted_section_content =  self.convert_content(content, content_format=content_format)
+            if content_format == "dict":
+                data["sections"][section_id] = converted_section_content
+            else:
+                data[section_id] = converted_section_content
 
         if include_full_transcript:
-            if transcript_format == "dict":
-                data["transcript"] = self.transcript
-            elif transcript_format == "html":
-                data["transcript"] = self.transcription.to_html()
-            elif transcript_format == "str":
-                data["transcript"] = self.transcription.to_str()
+            data["transcription"] = transcription
 
         return data
 
@@ -90,16 +116,15 @@ class Summary:
         summary_template = "{title}\nДата: {creation_date}\nУчастники: {speakers}"
 
         for section_id, content in self.sections.items():
-            header = content['name']
-            summary_template += f"\n\n{header}:\n{{{section_id}}}\n"
+            if section_id != "title":
+                header = content['name']
+                summary_template += f"\n\n{header}:\n{{{section_id}}}\n"
 
         if include_full_transcript:
-            summary_template += "\n\nРасшифровка\n{transcript}"
-        format_args = self.to_dict(
-            include_full_transcript=include_full_transcript, transcript_format="str"
-        )
-        summary = summary_template.format(**format_args)
-        return summary
+            summary_template += "\n\nРасшифровка\n{transcription}"
+
+        format_args = self.to_dict(include_full_transcript=include_full_transcript, content_format="str")
+        return summary_template.format(**format_args)
 
     def to_html(self, include_full_transcript: bool = False):
         summary_template = """
@@ -116,12 +141,10 @@ class Summary:
             summary_template += f'<br><br><b>{header}:</b><br>{{{section_id}}}'
 
         if include_full_transcript:
-            summary_template += "<br><br><b>Расшифровка</b><br>{transcript}"
+            summary_template += "<br><br><b>Расшифровка</b><br>{transcription}"
 
         summary_template += "</body></html>"
-        format_args = self.to_dict(
-            include_full_transcript=include_full_transcript, transcript_format="html"
-        )
+        format_args = self.to_dict(include_full_transcript=include_full_transcript, content_format="html")
         summary = summary_template.format(**format_args)
         return summary
 
@@ -146,27 +169,17 @@ class Summary:
             f.write(self.to_html(include_full_transcript=True))
         logging.info(f"Summary saved to {output_path}")
 
-    def save_pdf(self, output_path: str = "summary.txt"):
-        from summarization.pdfutils import html2pdf
-        assert output_path.endswith(".pdf"), "Output path must end with .pdf"
-        html_content = self.to_html(include_full_transcript=True)
-        html2pdf(html_content, output_path)
-        logging.info(f"Summary saved to {output_path}")
-
-    # TODO: подумать нужна ли вообще эта ф-я
     @classmethod
     def from_dict(cls, data):
-        # summary_data = {
-        #     'transcription': data['transcript'],
-        #     'sections': {}
-        # }
-        # for key in data:
-        #     if key == 'transcription':
-        #         summary_data['transcription'] = data[key]
-        #     if key not in ['creation_data', 'speakers']:
-        #         summary_data['sections'][key] = data[key]
-        # return cls(**summary_data)
-        return cls(**data)
+        summary_data = {
+            'sections': {},
+            'transcription': data.get('transcription', None),
+            'creation_date': data.get('creation_date', None)
+        }
+        for key, value in data["sections"].items():
+            summary_data['sections'][key] = value
+        summary = cls(**summary_data)
+        return summary
 
     @classmethod
     def from_json(cls, path):
@@ -240,16 +253,16 @@ if __name__ == "__main__":
             "type": "json"
         },
     }
-    with open("asr/results/transcription_merged.json") as f:
-        transcript = json.load(f)
 
-    summary = Summary(
-        sections=sections,
-        transcription=transcript,
-    )
+
+    with open("results/anon_summary.json") as f:
+        summary_dict = json.load(f)
+
+    summary = Summary.from_dict(summary_dict)
+    print(summary)
+
 
     print(summary)
-    summary.save_html("summarization/results/summary.html")
-    summary.save_txt("summarization/results/summary.txt")
-    summary.save_json("summarization/results/summary.json")
-    summary.save_pdf("summarization/results/summary.pdf")
+    summary.save_html("results/summary.html")
+    summary.save_txt("results/summary.txt")
+    summary.save_json("results/summary.json")
