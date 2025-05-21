@@ -1,14 +1,14 @@
 import re
-from copy import deepcopy
-from typing import List, Optional, Union, Tuple, Dict
 from collections import defaultdict
+from copy import deepcopy
+from typing import Dict, List, Optional, Tuple, Union
 
-from anonymization.utils import untokenize
-from anonymization.postprocess_ner import postprocess_preds
-from anonymization.ner_utils import bio2tag
 from anonymization.entity_extractor import EntityExtractor
-from anonymization.normalization import Normalizer
+from anonymization.ner_utils import bio2tag
 from anonymization.ner_validation import LLMValidator
+from anonymization.normalization import Normalizer
+from anonymization.postprocess_ner import postprocess_preds
+from anonymization.utils import untokenize
 
 
 class Anonymizer:

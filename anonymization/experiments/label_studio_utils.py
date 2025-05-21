@@ -1,6 +1,7 @@
 import json
-import re
 import random
+import re
+
 
 def tag2labelstudio(path):
     with open(path) as f:

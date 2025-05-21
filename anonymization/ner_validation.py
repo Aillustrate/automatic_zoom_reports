@@ -1,11 +1,11 @@
 import re
 from copy import deepcopy
 
-from config import config
-from anonymization.ner_utils import bio2tag, tag2bio, get_entity_positions
+from anonymization.ner_utils import bio2tag, get_entity_positions, tag2bio
 from anonymization.postprocess_ner import correct_labels
 from anonymization.utils import hasnum, hasproper
 from anonymization.vllm_model import VLLMModel
+from config import config
 
 
 def get_verdicts(logprobs, th = 0.5):

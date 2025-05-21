@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 from copy import deepcopy
 
-from config import config
-from anonymization.vllm_model import VLLMModel, remove_thinking
-from summarization.summary import Summary
 from anonymization.utils import compare_strings
+from anonymization.vllm_model import VLLMModel, remove_thinking
+from config import config
+from summarization.summary import Summary
 
 
 class BaseDeanonymizer(ABC):

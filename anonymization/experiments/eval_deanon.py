@@ -1,13 +1,13 @@
 import random
+
 try:
     import pymorphy3
 except ImportError:
     print("pymorphy3 not installed")
 from copy import deepcopy
 
-
-from anonymization.utils import split_punctuation, untokenize
 from anonymization.entity_anonymization import compare_strings
+from anonymization.utils import split_punctuation, untokenize
 
 random.seed(42)
 

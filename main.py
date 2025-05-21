@@ -1,9 +1,11 @@
-from automatic_zoom_reports.asr.transriber import Transcriber
+from automatic_zoom_reports.anonymization.anonymizer import Anonymizer
+from automatic_zoom_reports.anonymization.entity_insertion import \
+    BaseDeanonymizer
 from automatic_zoom_reports.asr.transcription import Transcription
+from automatic_zoom_reports.asr.transriber import Transcriber
 from automatic_zoom_reports.summarization.summarizer import Summarizer
 from automatic_zoom_reports.summarization.summary import Summary
-from automatic_zoom_reports.anonymization.anonymizer import Anonymizer
-from automatic_zoom_reports.anonymization.entity_insertion import BaseDeanonymizer
+
 
 class Pipeline:
     def __init__(

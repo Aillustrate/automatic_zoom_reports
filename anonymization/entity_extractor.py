@@ -1,12 +1,12 @@
-from typing import List, Union, Optional, Tuple
-from tqdm.auto import trange
+from typing import List, Optional, Tuple, Union
 
 import torch
 from torch import nn
-from transformers import AutoTokenizer, AutoModelForTokenClassification
+from tqdm.auto import trange
+from transformers import AutoModelForTokenClassification, AutoTokenizer
 
-from config import config
 from anonymization.utils import split_punctuation
+from config import config
 
 
 def load_model_and_tokenizer(model_name_or_path=config.anonymization.ner_model):

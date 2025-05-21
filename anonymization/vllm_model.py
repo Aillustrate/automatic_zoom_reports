@@ -1,10 +1,11 @@
 import re
 
 try:
-    from vllm import SamplingParams, LLM
+    from vllm import LLM, SamplingParams
 except:
     print("Error importing vllm")
 from transformers import AutoTokenizer
+
 
 def remove_thinking(text):
         matches = re.findall(r"<think>.*?</think>(.*)", text, re.DOTALL)

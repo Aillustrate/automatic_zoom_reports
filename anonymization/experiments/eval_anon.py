@@ -6,6 +6,7 @@ import pandas as pd
 
 from anonymization.ner_utils import bio2tag, get_entity_positions
 
+
 def entity_metrics(predictions, ground_truth, strict=True, format="pd"):
     correct_entities = 0
     total_true_entities = 0

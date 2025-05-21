@@ -1,9 +1,10 @@
-import re
 import json
-from collections import defaultdict, Counter
+import re
+from collections import Counter, defaultdict
 
 from anonymization.postprocess_ner import correct_labels
 from anonymization.utils import untokenize
+
 
 def get_entity_positions(labels):
     labels = correct_labels(labels)  # Correct labels before processing
@@ -44,6 +45,7 @@ def parse_dialogs(file_path):
 
 def tag2bio(text):
     import re
+
     # Dictionary to keep track of entity counts
     entity_count = {}
     # List to hold the tokens, BIO tags, and entity numbers
