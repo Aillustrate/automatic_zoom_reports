@@ -1,5 +1,5 @@
 from typing import List, Union, Optional, Tuple
-from tqdm import trange
+from tqdm.auto import trange
 
 import torch
 from torch import nn
@@ -9,7 +9,7 @@ from config import config
 from anonymization.utils import split_punctuation
 
 
-def load_model_and_tokenizer(model_name_or_path=config.anonymization.model):
+def load_model_and_tokenizer(model_name_or_path=config.anonymization.ner_model):
     model = AutoModelForTokenClassification.from_pretrained(model_name_or_path)
     tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
     return model, tokenizer
@@ -20,7 +20,7 @@ class EntityExtractor:
             self,
             model: Optional[AutoModelForTokenClassification] = None,
             tokenizer: Optional[AutoTokenizer] = None,
-            model_name_or_path: Optional[str] = None,
+            model_name_or_path: Optional[str] = config.anonymization.ner_model,
             device: Optional[Union[torch.device, str]] = None,
             ):
         """
@@ -105,8 +105,8 @@ class EntityExtractor:
 
     def extract(
         self,
-        texts: Union[List[str], List[str[str]]],
-        labels: Optional[List[str[str]]] = None,
+        texts: Union[List[str], List[List[str]]],
+        labels: Optional[List[List[str]]] = None,
         ) -> List[List[str]]:
         """Extracts entities from a list of texts
         Args:

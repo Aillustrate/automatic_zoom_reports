@@ -21,7 +21,7 @@ def get_config() -> AttrDict:
     llm.token_usage_report_path = "llm/token_usage.json"
 
     config.anonymization = anonymization = AttrDict()
-    anonymization.model = "denis-gordeev/rured2-ner-microsoft-mdeberta-v3-base"
+    anonymization.ner_model = "denis-gordeev/rured2-ner-microsoft-mdeberta-v3-base"
     anonymization.llm_validator_model = "Qwen/Qwen-2.5-0.5B-Instruct"
     anonymization.llm_validator_prompt_path = "anonymization/prompts/validation_prompt.txt"
     anonymization.llm_inserter_prompt_path = "anonymization/prompts/insert4_en.txt"

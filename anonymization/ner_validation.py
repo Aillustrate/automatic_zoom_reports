@@ -2,7 +2,7 @@ import re
 from copy import deepcopy
 
 from config import config
-from anonymization.data_utils import bio2tag, tag2bio, get_entity_positions
+from anonymization.ner_utils import bio2tag, tag2bio, get_entity_positions
 from anonymization.postprocess_ner import correct_labels
 from anonymization.utils import hasnum, hasproper
 from anonymization.vllm_model import VLLMModel
@@ -20,7 +20,53 @@ def get_verdicts(logprobs, th = 0.5):
     return verdicts
 
 
-class LLMValidator:
+class BaseValidator:
+    def __init__(self):
+        pass
+
+    def get_entities(self, tokens, labels):
+        entities = []
+        contexts = []
+        entity_positions = []
+        for i, (ut_tokens, ut_labels) in enumerate(zip(tokens, labels)):
+            context = bio2tag(ut_tokens, ut_labels)
+            contexts.append(context)
+            entities.append([])
+            positions = get_entity_positions(ut_labels)
+            filtered_postitions = []
+            if positions:
+                for start, end in positions:
+                    entity = bio2tag(ut_tokens[start:end], ut_labels[start:end])
+                    if not hasproper(entity) and not hasnum(entity):
+                        entities[-1].append((entity))
+                        filtered_postitions.append((start, end))
+            entity_positions.append(filtered_postitions)
+        return entities, contexts, entity_positions
+
+    def judge(self, entities, contexts):
+        verdicts = [True for ut_entities in entities for entity in ut_entities]
+        return verdicts
+
+    def validate_entities(self, tokens, labels):
+        entities, contexts, entity_positions = self.get_entities(tokens, labels)
+        verdicts = self.judge(entities, contexts)
+        #print(verdicts)
+        validated_labels = deepcopy(labels)
+        n = 0
+        for i, _ in enumerate(entity_positions):
+            for j, (start, end) in enumerate(entity_positions[i]):
+                verdict = verdicts[n]
+                print(entities[i][j], verdict)
+                if verdict is False:
+                    for k in range(start, end):
+                        validated_labels[i][k] = "O"
+                n+=1
+
+        return validated_labels
+
+
+
+class LLMValidator(BaseValidator):
     def __init__(self,
                  llm=None,
                  logprobs=True,
@@ -29,6 +75,7 @@ class LLMValidator:
                  system_prompt_path=config.anonymization.llm_validator_prompt_path,
                  model_name_or_path=None,
                  **kwargs):
+        super().__init__()
         if llm is not None:
             self.llm = llm
         else:
@@ -81,49 +128,4 @@ class LLMValidator:
             responses = self.llm.respond(prompts)
             verdicts = self.parse_responses(responses)
         return verdicts
-
-    def get_entities(self, tokens, labels):
-        entities = []
-        contexts = []
-        entity_positions = []
-        for i, (ut_tokens, ut_labels) in enumerate(zip(tokens, labels)):
-            context = bio2tag(ut_tokens, ut_labels)
-            contexts.append(context)
-            entities.append([])
-            positions = get_entity_positions(ut_labels)
-            filtered_postitions = []
-            if positions:
-                for start, end in positions:
-                    entity = bio2tag(ut_tokens[start:end], ut_labels[start:end])
-                    if not hasproper(entity) and not hasnum(entity):
-                        entities[-1].append((entity))
-                        filtered_postitions.append((start, end))
-            entity_positions.append(filtered_postitions)
-        return entities, contexts, entity_positions
-
-
-    def validate_entities(self, tokens, labels):
-        entities, contexts, entity_positions = self.get_entities(tokens, labels)
-        verdicts = self.judge(entities, contexts)
-        #print(verdicts)
-        validated_labels = deepcopy(labels)
-        n = 0
-        for i, _ in enumerate(entity_positions):
-            for j, (start, end) in enumerate(entity_positions[i]):
-                verdict = verdicts[n]
-                print(entities[i][j], verdict)
-                if verdict is False:
-                    for k in range(start, end):
-                        validated_labels[i][k] = "O"
-                n+=1
-
-        return validated_labels
-
-
-
-if __name__ == "__main__":
-    text = "This is a <entity>test</entity> and another <entity>test</entity> and <entity>other</entity> and <org>other</org> and <org>other another</org> ."
-    tokens, labels, entity_nums = tag2bio(text)
-    validator = LLMValidator(None)
-    print(validator.validate_entities([tokens], [labels]))
 

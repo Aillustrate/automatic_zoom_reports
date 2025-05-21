@@ -1,7 +1,17 @@
-from anonymization.utils import hasnum, hasproper
-
 from summarization.summary import Summary
+from anonymization.utils import hasnum, hasproper
 from anonymization.deanonymizer import RawDeanonymizer
+from anonymization.postprocess_ner import correct_labels
+from anonymization.ner_utils import tag2bio
+from anonymization.ner_validation import BaseValidator
+
+
+def test_validation():
+    text = "This is a <entity>test</entity> and another <entity>test</entity> and <entity>other</entity> and <org>other</org> and <org>other another</org> ."
+    expected_output = [['O', 'O', 'O', 'B-entity', 'O', 'O', 'B-entity', 'O', 'B-entity', 'O', 'B-org', 'O', 'B-org', 'I-org', 'O']]
+    tokens, labels, entity_nums = tag2bio(text)
+    validator = BaseValidator()
+    assert validator.validate_entities([tokens], [labels]) == expected_output
 
 
 def test_deanonymization():
@@ -20,6 +30,14 @@ def test_deanonymization():
     deanonymizer = RawDeanonymizer()
     deanonymized_summary = deanonymizer.deanonymize(anonymized_summary, mapping)
     assert all(mapping[key] in deanonymized_summary.to_str() for key in mapping.keys())
+
+def test_fix_ner_annotations():
+    #labels = [['O'], ['I-PERSON'], ['I-GPE', 'I-PERSON'], ['B-LOCATION'], ['B-LOCATION', 'B-CITY'], ['I-LOCATION'], ['O'], ['B-PERSON']]
+    labels = ['O', 'I-PERSON', 'I-PERSON', 'B-LOCATION', 'I-LOCATION', 'B-LOCATION', 'O', 'I-PERSON']
+    expected_output = ['O', 'B-PERSON', 'I-PERSON', 'B-LOCATION', 'I-LOCATION', 'I-LOCATION', 'O', 'B-PERSON']
+    output = correct_labels(labels)
+    # Check if the output matches the expected output
+    assert output == expected_output, f"Expected {expected_output}, but got {output}"
 
 def test_hasnum():
     assert hasnum('23') == True

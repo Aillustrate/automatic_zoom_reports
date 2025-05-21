@@ -5,7 +5,7 @@ from collections import defaultdict
 
 from anonymization.utils import untokenize
 from anonymization.postprocess_ner import postprocess_preds
-from anonymization.data_utils import bio2tag
+from anonymization.ner_utils import bio2tag
 from anonymization.entity_extractor import EntityExtractor
 from anonymization.normalization import Normalizer
 from anonymization.ner_validation import LLMValidator

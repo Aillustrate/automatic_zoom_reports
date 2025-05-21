@@ -4,7 +4,7 @@ from collections import defaultdict
 
 import pandas as pd
 
-from anonymization.data_utils import bio2tag, get_entity_positions
+from anonymization.ner_utils import bio2tag, get_entity_positions
 
 def entity_metrics(predictions, ground_truth, strict=True, format="pd"):
     correct_entities = 0
