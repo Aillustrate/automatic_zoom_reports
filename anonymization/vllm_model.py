@@ -1,6 +1,9 @@
 import re
 
-from vllm import SamplingParams, LLM
+try:
+    from vllm import SamplingParams, LLM
+except:
+    print("Error importing vllm")
 from transformers import AutoTokenizer
 
 def remove_thinking(text):

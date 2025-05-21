@@ -82,7 +82,7 @@ class Summary:
 
     def convert_transcription(self, content_format="dict"):
         if content_format == "html":
-            speakers = self.transcription.get_speaker_ledgend()
+            speakers = self.transcription.get_speaker_legend()
             transcription = self.transcription.to_html()
         elif content_format == "str":
              speakers = ", ".join(self.transcription.speakers)
@@ -100,8 +100,8 @@ class Summary:
             "sections": {}
             }
 
-        for section_id, content in self.sections.items():
-            converted_section_content =  self.convert_content(content, content_format=content_format)
+        for section_id, section in self.sections.items():
+            converted_section_content =  self.convert_content(section, content_format=content_format)
             if content_format == "dict":
                 data["sections"][section_id] = converted_section_content
             else:
@@ -115,9 +115,9 @@ class Summary:
     def to_str(self, include_full_transcript: bool = False) -> str:
         summary_template = "{title}\nДата: {creation_date}\nУчастники: {speakers}"
 
-        for section_id, content in self.sections.items():
+        for section_id, section in self.sections.items():
             if section_id != "title":
-                header = content['name']
+                header = section['name']
                 summary_template += f"\n\n{header}:\n{{{section_id}}}\n"
 
         if include_full_transcript:
@@ -136,8 +136,8 @@ class Summary:
         <b>Участники:</b> {speakers}<br>
         """
 
-        for section_id, content in self.sections.items():
-            header = content['name']
+        for section_id, section in self.sections.items():
+            header = section['name']
             summary_template += f'<br><br><b>{header}:</b><br>{{{section_id}}}'
 
         if include_full_transcript:

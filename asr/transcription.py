@@ -124,7 +124,7 @@ class Transcription:
         return sep.join(lines)
 
     def to_html(self):
-        speaker_legend = f"<b>Участники:</b> {self.get_speaker_ledgend()}"
+        speaker_legend = f"<b>Участники:</b> {self.get_speaker_legend()}"
         content = self.to_str(to_html=True)
         body = f"<body>{speaker_legend}<br>{content}</body>"
         doc = f'<html><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">{body}</html>'
@@ -167,7 +167,7 @@ class Transcription:
                 color = self.speaker2color.pop(old_speaker)
                 self.speaker2color.update({new_speaker: color})
 
-    def get_speaker_ledgend(self):
+    def get_speaker_legend(self):
         legend = []
         for speaker in sorted(self.speakers):
             color = self.speaker2color.get(speaker)
@@ -243,6 +243,6 @@ if __name__ == "__main__":
         }
     )
     print(transcription)
-    print(transcription.get_speaker_ledgend())
+    print(transcription.get_speaker_legend())
 
     # print(merge_same_speakers(transcription.result))
