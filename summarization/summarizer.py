@@ -24,7 +24,7 @@ from summarization.output_validation import (
 logging.basicConfig(level=logging.DEBUG)
 
 class Summarizer:
-    def __init__(self, token_usage_report_path, scenario_type: str = "base_meeting"):
+    def __init__(self, token_usage_report_path: str = "llm_utils/token_usage.json", scenario_type: str = "base_meeting"):
         self.llm = LLM(token_usage_report_path)
         self.scenario_manager = ScenarioManager()
         self.scenario = self.scenario_manager.get_scenario(scenario_type)
@@ -76,7 +76,7 @@ class Summarizer:
 
 
 if __name__ == "__main__":
-    summary = Summarizer("summarization/token_usage.json").summarize(
+    summary = Summarizer().summarize(
         Transcription.from_json("asr/results/transcription_merged.json")
     )
     print(summary)

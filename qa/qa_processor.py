@@ -20,7 +20,7 @@ class QAProcessor:
     Отвечай кратко и по существу.
     """
 
-    def __init__(self, token_usage_report_path: str):
+    def __init__(self, token_usage_report_path: str = "llm_utils/token_usage.json"):
         self.llm = LLM(token_usage_report_path)
 
     def process_transcript(self, transcript: list[Dict[str, Any]]):
@@ -55,7 +55,7 @@ class QAProcessor:
 
 if __name__ == "__main__":
     # Пример использования
-    qa_processor = QAProcessor("qa/token_usage.json")
+    qa_processor = QAProcessor()
     answer = qa_processor.answer_question(
         "Какие основные темы обсуждались на встрече?",
         Transcription.from_json("asr/results/transcription_merged.json")
