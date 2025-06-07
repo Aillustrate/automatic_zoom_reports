@@ -12,7 +12,7 @@ if ROOT_DIR not in sys.path:
 from asr.transcription import Transcription, load_transcription_and_transcript
 from summarization.summary import Summary
 from summarization.scenario_manager import ScenarioManager
-from summarization.llm import LLM
+from llm_utils.llm import LLM
 from summarization.parsing_utils import (parse_json_structure,
                                          process_list_structure)
 from summarization.output_validation import (
@@ -66,7 +66,7 @@ class Summarizer:
         # with open('test_results.json', "r", encoding="utf-8") as f:
         #     results = json.load(f)
 
-        #print(results)
+        print(results)
         summary = Summary(
             sections=results,
             transcription=transcription,

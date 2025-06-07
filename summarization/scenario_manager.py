@@ -1,40 +1,37 @@
 import yaml
-from pathlib import Path
 from dataclasses import dataclass
-from typing import List, Dict
+from pathlib import Path
+from typing import Dict, Any, List
 
 @dataclass
-class Section:
+class ScenarioSection:
     id: str
     name: str
-    prompt: str
     type: str
+    prompt: str
 
 @dataclass
 class Scenario:
     name: str
     system_context: str
-    sections: List[Section]
+    sections: List[ScenarioSection]
 
 class ScenarioManager:
-    def __init__(self, scenarios_dir: str = "summarization/scenarios"):
-        self.scenarios_dir = Path(scenarios_dir)
-        self.scenarios: Dict[str, Scenario] = {}
-        self._load_scenarios()
-    
-    def _load_scenarios(self):
-        for scenario_file in self.scenarios_dir.glob("*.yaml"):
-            with open(scenario_file, 'r', encoding='utf-8') as f:
-                data = yaml.safe_load(f)
-                sections = [Section(**section) for section in data['sections']]
-                scenario = Scenario(
-                    name=data['name'],
-                    system_context=data['system_context'],
-                    sections=sections
-                )
-                self.scenarios[scenario_file.stem] = scenario
-    
+    def __init__(self, scenarios_dir: str = None):
+        if scenarios_dir is None:
+            self.scenarios_dir = Path(__file__).parent / "scenarios"
+        else:
+            self.scenarios_dir = Path(scenarios_dir)
+
     def get_scenario(self, scenario_type: str) -> Scenario:
-        if scenario_type not in self.scenarios:
-            raise ValueError(f"Unknown scenario type: {scenario_type}")
-        return self.scenarios[scenario_type] 
+        scenario_path = self.scenarios_dir / f"{scenario_type}.yaml"
+        if not scenario_path.exists():
+            raise FileNotFoundError(f"Scenario file not found: {scenario_path}")
+
+        with open(scenario_path, "r", encoding="utf-8") as f:
+            scenario_data = yaml.safe_load(f)
+            return Scenario(
+                name=scenario_data["name"],
+                system_context=scenario_data["system_context"],
+                sections=[ScenarioSection(**section) for section in scenario_data["sections"]]
+            ) 

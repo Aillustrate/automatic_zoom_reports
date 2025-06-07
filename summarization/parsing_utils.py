@@ -2,8 +2,6 @@ import json
 import re
 from typing import Dict, List
 
-from summarization.output_validation import validate_structured_summary
-
 
 def parse_json_structure(text) -> List[Dict[str, List[str]]]:
     text = re.sub(r'^```json', "", text)
@@ -70,4 +68,3 @@ if __name__ == "__main__":
 ```
 """
     structured_summary = parse_json_structure(text)
-    print(validate_structured_summary(structured_summary))
